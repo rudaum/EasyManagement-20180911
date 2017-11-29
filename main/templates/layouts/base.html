@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+        <title> {% block title %} {% endblock %} </title>
+    </head>
+    <body>
+        <main class="container">
+            <div class="md-margin-top">{% block heading %}{% endblock %}</div>
+            {% block body %}{% endblock %}
+        </main>
+        <footer class="footer text-center">
+            <div class="container">
+                <ul class="list-inline">
+                    <li class="text-muted">Easy Management &copy; 2017</li>
+                    <li><a href="">Privacy Policy</a></li>
+                    <li><a href="">Terms of Service</a></li>
+                    <li><a href="">FAQ</a></li>
+                </ul>
+            </div>
+        </footer>
+  </body>
+</html>
