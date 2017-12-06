@@ -1,0 +1,56 @@
+{% extends 'layouts/base.html' %}
+{% block title %} Easy Manager - Users {% endblock %}
+
+{% block body %}
+<div class="container container-main">
+    <p>Type something in the input field to search the table:</p>
+    <input class="form-control" id="mySearch" type="text" placeholder="Search..">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody id="usersTable">
+            <tr class="success">
+                <td>Success</td>
+                <td>Doe</td>
+                <td>john@example.com</td>
+            </tr>
+            <tr class="danger">
+                <td>Danger</td>
+                <td>Moe</td>
+                <td>mary@example.com</td>
+            </tr>
+            <tr class="active">
+                <td>Active</td>
+                <td>Activeson</td>
+                <td>act@example.com</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="sheets-footer">
+        <ul class="pagination">
+            <li><a data-toggle="pill" href="#users">Report</a></li>
+            <li><a data-toggle="pill" href="#users">root</a></li>
+            <li><a data-toggle="pill" href="#users">rwolter</a></li>
+            <li><a data-toggle="pill" href="#users">nagios</a></li>
+        </ul>
+    </div>
+</div>
+
+<script>
+$(document).ready(function(){
+  $("#mySearch").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#usersTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script>
+
+
+{% endblock %}

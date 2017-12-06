@@ -276,9 +276,18 @@ def mksheet(raw_users):
 		which comes as a dictionary tree. Then it saves it as a html
 		file format
 		"""
+		html_file = open('/rudolf.wolter/python/EasyManagement/main/tools/blueprints/page/templates/test.txt','w+')
 		users = order_by_user(raw_users)  # formating lsusers raw output
 
+		# Preparing the HTML Static content
+		html_file.write("{% extends 'layouts/base.html' %}\n")
+		html_file.write("{% block title %} Easy	Manager - Users	{% endblock %}\n")
+		html_file.write("\n")
+		html_file.write("{% block body %}\n")
+		html_file.close()
+
 		for user in users.iterkeys():  # Looping over Users
+			my_file = open('test.txt', 'w+')
 
 			for host in users[user].iterkeys():  # Looping over hosts
 				host_col = ws.max_column + 1

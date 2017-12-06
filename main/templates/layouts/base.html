@@ -3,13 +3,27 @@
     <head>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+        <script src="/static/js/jquery.min.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
         <title> {% block title %} {% endblock %} </title>
     </head>
     <body>
-
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4"><h2><a href="/"> Easy Management</a></h2></div>
+                <div class="col-sm-4"></div>
+            </div>
+        </div>
+        <div class="container">
+            <ul class="navbar navbar-default nav-bigger">
+                <li><a href="/">Home</a></li>
+                <li><a href="/users">Users</a></li>
+            </ul>
+        </div>
         {% block body %}{% endblock %}
 
-        <footer class="footer text-center">
+        <footer class="footer">
             <div class="container">
                 <ul class="list-inline">
                     <li class="text-muted">Easy Management &copy; 2017</li>

@@ -16,4 +16,5 @@ app.config.from_object('config.settings')
 # Calling the Main Page Blueprints
 app.register_blueprint(page)
 
+
 app.run()
