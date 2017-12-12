@@ -3,54 +3,49 @@
 
 {% block body %}
 <div class ="container" >
-   <a href="#Report" class ="btn btn-primary" role="button">Report</a>
-   <div class="dropdown">
-       <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Users
-       <span class="caret"></span></button>
-       <ul class="dropdown-menu">
-           <input class="form-control" id="userFilter" type="text" placeholder="Filter...">
-           <li ><a data-toggle="pill" href="#root">root</a></li>
-           <li ><a data-toggle="pill" href="#daemon">daemon</a></li>
-           <li ><a data-toggle="pill" href="#bin">bin</a></li>
-           <li ><a data-toggle="pill" href="#sys">sys</a></li>
-           <li ><a data-toggle="pill" href="#adm">adm</a></li>
-           <li ><a data-toggle="pill" href="#uucp">uucp</a></li>
-           <li ><a data-toggle="pill" href="#guest">guest</a></li>
-           <li ><a data-toggle="pill" href="#nobody">nobody</a></li>
-           <li ><a data-toggle="pill" href="#lpd">lpd</a></li>
-           <li ><a data-toggle="pill" href="#lp">lp</a></li>
-           <li ><a data-toggle="pill" href="#invscout">invscout</a></li>
-           <li ><a data-toggle="pill" href="#snapp">snapp</a></li>
-           <li ><a data-toggle="pill" href="#ipsec">ipsec</a></li>
-           <li ><a data-toggle="pill" href="#nuucp">nuucp</a></li>
-           <li ><a data-toggle="pill" href="#pconsole">pconsole</a></li>
-           <li ><a data-toggle="pill" href="#srvproxy">srvproxy</a></li>
-           <li ><a data-toggle="pill" href="#esaadmin">esaadmin</a></li>
-           <li ><a data-toggle="pill" href="#sshd">sshd</a></li>
-           <li ><a data-toggle="pill" href="#nagios">nagios</a></li>
-           <li ><a data-toggle="pill" href="#critter">critter</a></li>
-           <li ><a data-toggle="pill" href="#ujanssen">ujanssen</a></li>
-           <li ><a data-toggle="pill" href="#nketelse">nketelse</a></li>
-           <li ><a data-toggle="pill" href="#ohannula">ohannula</a></li>
-           <li ><a data-toggle="pill" href="#rwolter">rwolter</a></li>
-           <li ><a data-toggle="pill" href="#kharrak">kharrak</a></li>
-           <li ><a data-toggle="pill" href="#hholst">hholst</a></li>
-           <li ><a data-toggle="pill" href="#edi">edi</a></li>
-           <li ><a data-toggle="pill" href="#ansiblec">ansiblec</a></li>
-           <li ><a data-toggle="pill" href="#foo">foo</a></li>
-           <li ><a data-toggle="pill" href="#miejf">miejf</a></li>
-           <li ><a data-toggle="pill" href="#miehy">miehy</a></li>
-           <li ><a data-toggle="pill" href="#extrr">extrr</a></li>
-           <li ><a data-toggle="pill" href="#extto">extto</a></li>
-           <li ><a data-toggle="pill" href="#extrn">extrn</a></li>
-           <li ><a data-toggle="pill" href="#extlt">extlt</a></li>
-           <li ><a data-toggle="pill" href="#extbl">extbl</a></li>
-           <li ><a data-toggle="pill" href="#micsw">micsw</a></li>
-           <li ><a data-toggle="pill" href="#hmcscan">hmcscan</a></li>
-           <li ><a data-toggle="pill" href="#emrichp">emrichp</a></li>
-           <li ><a data-toggle="pill" href="#hkentgen">hkentgen</a></li>
-       </ul>
-   </div>
+   <ul class="nav nav-pills">
+       <li class="active"><a data-toggle="pill" href="#Report">Report</a></li>
+       <li><a data-toggle="pill" href="#root">root</a></li>
+       <li><a data-toggle="pill" href="#daemon">daemon</a></li>
+       <li><a data-toggle="pill" href="#bin">bin</a></li>
+       <li><a data-toggle="pill" href="#sys">sys</a></li>
+       <li><a data-toggle="pill" href="#adm">adm</a></li>
+       <li><a data-toggle="pill" href="#uucp">uucp</a></li>
+       <li><a data-toggle="pill" href="#guest">guest</a></li>
+       <li><a data-toggle="pill" href="#nobody">nobody</a></li>
+       <li><a data-toggle="pill" href="#lpd">lpd</a></li>
+       <li><a data-toggle="pill" href="#lp">lp</a></li>
+       <li><a data-toggle="pill" href="#invscout">invscout</a></li>
+       <li><a data-toggle="pill" href="#snapp">snapp</a></li>
+       <li><a data-toggle="pill" href="#ipsec">ipsec</a></li>
+       <li><a data-toggle="pill" href="#nuucp">nuucp</a></li>
+       <li><a data-toggle="pill" href="#pconsole">pconsole</a></li>
+       <li><a data-toggle="pill" href="#srvproxy">srvproxy</a></li>
+       <li><a data-toggle="pill" href="#esaadmin">esaadmin</a></li>
+       <li><a data-toggle="pill" href="#sshd">sshd</a></li>
+       <li><a data-toggle="pill" href="#nagios">nagios</a></li>
+       <li><a data-toggle="pill" href="#critter">critter</a></li>
+       <li><a data-toggle="pill" href="#ujanssen">ujanssen</a></li>
+       <li><a data-toggle="pill" href="#nketelse">nketelse</a></li>
+       <li><a data-toggle="pill" href="#ohannula">ohannula</a></li>
+       <li><a data-toggle="pill" href="#rwolter">rwolter</a></li>
+       <li><a data-toggle="pill" href="#kharrak">kharrak</a></li>
+       <li><a data-toggle="pill" href="#hholst">hholst</a></li>
+       <li><a data-toggle="pill" href="#edi">edi</a></li>
+       <li><a data-toggle="pill" href="#ansiblec">ansiblec</a></li>
+       <li><a data-toggle="pill" href="#foo">foo</a></li>
+       <li><a data-toggle="pill" href="#miejf">miejf</a></li>
+       <li><a data-toggle="pill" href="#miehy">miehy</a></li>
+       <li><a data-toggle="pill" href="#extrr">extrr</a></li>
+       <li><a data-toggle="pill" href="#extto">extto</a></li>
+       <li><a data-toggle="pill" href="#extrn">extrn</a></li>
+       <li><a data-toggle="pill" href="#extlt">extlt</a></li>
+       <li><a data-toggle="pill" href="#extbl">extbl</a></li>
+       <li><a data-toggle="pill" href="#micsw">micsw</a></li>
+       <li><a data-toggle="pill" href="#hmcscan">hmcscan</a></li>
+       <li><a data-toggle="pill" href="#emrichp">emrichp</a></li>
+       <li><a data-toggle="pill" href="#hkentgen">hkentgen</a></li>
+   </ul>
    <div class="tab-content">
        <div id="Report" class="tab-pane">
            <p>Usuario: Report</p>
@@ -177,14 +172,4 @@
        </div>
    </div>
 </div>
-<script>
-   $(document).ready(function(){
-       $("#userFilter").on("keyup", function() {
-           var value = $(this).val().toLowerCase();
-           $(".dropdown-menu li").filter(function() {
-               $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-           });
-       });
-   });
-</script>
 {% endblock %}

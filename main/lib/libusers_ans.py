@@ -26,6 +26,7 @@ from subprocess import Popen, PIPE
 from openpyxl import Workbook
 from openpyxl.styles import Border, Side, PatternFill, Font, Alignment
 from collections import OrderedDict
+from pandas import read_excel
 # --------------------------------------------------------------- #
 ### END OF MODULE IMPORTS
 
@@ -187,7 +188,6 @@ def lsusers(targ_hosts, fulllist=False, user_filter="ALL"):
 	"""
 	hosts = OrderedDict()
 
-
 	if fulllist:
 		ans_cmd = ["/bin/ansible", "-ba", "lsuser -f " + user_filter]
 	else:
@@ -266,44 +266,65 @@ def mksheet(raw_users):
 				ws.cell(row=attr_row, column=host_col, value=attr[1])  # writting attribute value
 
 	format_wb(wb)
-	wb.save(FILENAME)  # saving t=he workbook
+	wb.save(FILENAME)  # saving the workbook
 	wb.close()
 # --------------------------------------------------------------- #
 # --------------------------------------------------------------- #
-	def mktable_html(raw_users):
-		"""
-		Builds an html out from the 'lsusers' function output,
-		which comes as a dictionary tree. Then it saves it as a html
-		file format
-		"""
-		html_file = open('/rudolf.wolter/python/EasyManagement/main/tools/blueprints/page/templates/test.txt','w+')
-		users = order_by_user(raw_users)  # formating lsusers raw output
+def mkhtml():
+    """
+    Builds an html Jinja2 Template out from the 'lsusers' function output,
+    which comes as a dictionary tree.
+    """
+    # Preparing the HTML Static content
+    html_file = open('../tools/blueprints/page/templates/users.html', 'w+')
+    html_file.write("{% extends 'layouts/base.html' %}\n")
+    html_file.write('{% block title %} Easy	Manager - Users	{% endblock %}\n')
+    html_file.write('\n')
+    html_file.write('{% block body %}\n')
+    excel_file = read_excel('em_lsusers.xlsx', None)
+    users = excel_file.keys() # list containing all users retrieved by Ansible
 
-		# Preparing the HTML Static content
-		html_file.write("{% extends 'layouts/base.html' %}\n")
-		html_file.write("{% block title %} Easy	Manager - Users	{% endblock %}\n")
-		html_file.write("\n")
-		html_file.write("{% block body %}\n")
-		html_file.close()
+    ### GENERATING THE HTML CODE ###
+    html_file.write('<div class="container" >\n')
 
-		for user in users.iterkeys():  # Looping over Users
-			my_file = open('test.txt', 'w+')
+    # Creating the Report Button
+    html_file.write('   <a href="#Report" class ="btn btn-primary" role="button">Report</a>\n')
 
-			for host in users[user].iterkeys():  # Looping over hosts
-				host_col = ws.max_column + 1
-				ws.cell(row=1, column=host_col, value=host)  # hostname on 1st row
-				ws.cell(row=2, column=1, value="User")  # User name Attribute
-				ws.cell(row=2, column=host_col, value=user)  # User name Value
-				for attr in users[user][host].iteritems():  # Looping over attributes
-					find_attr = find_in_col(ws, 1, attr[0])
-					if find_attr is False:
-						attr_row = ws.max_row + 1
-						ws.cell(row=attr_row, column=1, value=attr[0])  # writting attribute Name
-					else:
-						attr_row = find_attr.row
+    # Creating the dropdown Button with user filter
+    html_file.write('   <div class="dropdown">\n')
+    html_file.write('       <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Users\n')
+    html_file.write('       <span class="caret"></span></button>\n')
+    html_file.write('       <ul class="dropdown-menu">\n')
+    html_file.write('           <input class="form-control" id="userFilter" type="text" placeholder="Filter...">\n')
+    for user in users[1:]:
+        html_file.write('           <li ><a data-toggle="pill" href="#{}">{}</a></li>\n'.format(user, user))
+    html_file.write('       </ul>\n')
+    html_file.write('   </div>\n')
 
-					ws.cell(row=attr_row, column=host_col, value=attr[1])  # writting attribute value
-		format_wb(wb)
-		wb.save(FILENAME)  # saving the workbook
-		wb.close()
+    # looping over each user's tab and creating the appropriate HTML code
+    html_file.write('   <div class="tab-content">\n')
+    for user in excel_file.keys():
+        html_file.write('       <div id="{}" class="tab-pane">\n'.format(user))
+        html_file.write('           <p>Usuario: ' + user + '</p>\n')
+        #html = read_excel('em_lsusers.xlsx', user).to_html().encode('utf-8').split('\n')
+        html_file.write('       </div>\n')
+    html_file.write('   </div>\n')
+    html_file.write('</div>\n')
+    html_file.write('<script>\n')
+    html_file.write('   $(document).ready(function(){\n')
+    html_file.write('       $("#userFilter").on("keyup", function() {\n')
+    html_file.write('           var value = $(this).val().toLowerCase();\n')
+    html_file.write('           $(".dropdown-menu li").filter(function() {\n')
+    html_file.write('               $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)\n')
+    html_file.write('           });\n')
+    html_file.write('       });\n')
+    html_file.write('   });\n')
+    html_file.write('</script>\n')
+    ### END OF THE HTML CODE ###
+
+    html_file.write("{% endblock %}\n")
+    html_file.close()
+
+
+# --------------------------------------------------------------- #
 ### END OF FUNCTIONS DECLARATION
