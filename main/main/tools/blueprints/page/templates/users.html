@@ -1,0 +1,190 @@
+{% extends 'layouts/base.html' %}
+{% block title %} Easy	Manager - Users	{% endblock %}
+
+{% block body %}
+<div class ="container" >
+   <a href="#Report" class ="btn btn-primary" role="button">Report</a>
+   <div class="dropdown">
+       <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Users
+       <span class="caret"></span></button>
+       <ul class="dropdown-menu">
+           <input class="form-control" id="userFilter" type="text" placeholder="Filter...">
+           <li ><a data-toggle="pill" href="#root">root</a></li>
+           <li ><a data-toggle="pill" href="#daemon">daemon</a></li>
+           <li ><a data-toggle="pill" href="#bin">bin</a></li>
+           <li ><a data-toggle="pill" href="#sys">sys</a></li>
+           <li ><a data-toggle="pill" href="#adm">adm</a></li>
+           <li ><a data-toggle="pill" href="#uucp">uucp</a></li>
+           <li ><a data-toggle="pill" href="#guest">guest</a></li>
+           <li ><a data-toggle="pill" href="#nobody">nobody</a></li>
+           <li ><a data-toggle="pill" href="#lpd">lpd</a></li>
+           <li ><a data-toggle="pill" href="#lp">lp</a></li>
+           <li ><a data-toggle="pill" href="#invscout">invscout</a></li>
+           <li ><a data-toggle="pill" href="#snapp">snapp</a></li>
+           <li ><a data-toggle="pill" href="#ipsec">ipsec</a></li>
+           <li ><a data-toggle="pill" href="#nuucp">nuucp</a></li>
+           <li ><a data-toggle="pill" href="#pconsole">pconsole</a></li>
+           <li ><a data-toggle="pill" href="#srvproxy">srvproxy</a></li>
+           <li ><a data-toggle="pill" href="#esaadmin">esaadmin</a></li>
+           <li ><a data-toggle="pill" href="#sshd">sshd</a></li>
+           <li ><a data-toggle="pill" href="#nagios">nagios</a></li>
+           <li ><a data-toggle="pill" href="#critter">critter</a></li>
+           <li ><a data-toggle="pill" href="#ujanssen">ujanssen</a></li>
+           <li ><a data-toggle="pill" href="#nketelse">nketelse</a></li>
+           <li ><a data-toggle="pill" href="#ohannula">ohannula</a></li>
+           <li ><a data-toggle="pill" href="#rwolter">rwolter</a></li>
+           <li ><a data-toggle="pill" href="#kharrak">kharrak</a></li>
+           <li ><a data-toggle="pill" href="#hholst">hholst</a></li>
+           <li ><a data-toggle="pill" href="#edi">edi</a></li>
+           <li ><a data-toggle="pill" href="#ansiblec">ansiblec</a></li>
+           <li ><a data-toggle="pill" href="#foo">foo</a></li>
+           <li ><a data-toggle="pill" href="#miejf">miejf</a></li>
+           <li ><a data-toggle="pill" href="#miehy">miehy</a></li>
+           <li ><a data-toggle="pill" href="#extrr">extrr</a></li>
+           <li ><a data-toggle="pill" href="#extto">extto</a></li>
+           <li ><a data-toggle="pill" href="#extrn">extrn</a></li>
+           <li ><a data-toggle="pill" href="#extlt">extlt</a></li>
+           <li ><a data-toggle="pill" href="#extbl">extbl</a></li>
+           <li ><a data-toggle="pill" href="#micsw">micsw</a></li>
+           <li ><a data-toggle="pill" href="#hmcscan">hmcscan</a></li>
+           <li ><a data-toggle="pill" href="#emrichp">emrichp</a></li>
+           <li ><a data-toggle="pill" href="#hkentgen">hkentgen</a></li>
+       </ul>
+   </div>
+   <div class="tab-content">
+       <div id="Report" class="tab-pane">
+           <p>Usuario: Report</p>
+       </div>
+       <div id="root" class="tab-pane">
+           <p>Usuario: root</p>
+       </div>
+       <div id="daemon" class="tab-pane">
+           <p>Usuario: daemon</p>
+       </div>
+       <div id="bin" class="tab-pane">
+           <p>Usuario: bin</p>
+       </div>
+       <div id="sys" class="tab-pane">
+           <p>Usuario: sys</p>
+       </div>
+       <div id="adm" class="tab-pane">
+           <p>Usuario: adm</p>
+       </div>
+       <div id="uucp" class="tab-pane">
+           <p>Usuario: uucp</p>
+       </div>
+       <div id="guest" class="tab-pane">
+           <p>Usuario: guest</p>
+       </div>
+       <div id="nobody" class="tab-pane">
+           <p>Usuario: nobody</p>
+       </div>
+       <div id="lpd" class="tab-pane">
+           <p>Usuario: lpd</p>
+       </div>
+       <div id="lp" class="tab-pane">
+           <p>Usuario: lp</p>
+       </div>
+       <div id="invscout" class="tab-pane">
+           <p>Usuario: invscout</p>
+       </div>
+       <div id="snapp" class="tab-pane">
+           <p>Usuario: snapp</p>
+       </div>
+       <div id="ipsec" class="tab-pane">
+           <p>Usuario: ipsec</p>
+       </div>
+       <div id="nuucp" class="tab-pane">
+           <p>Usuario: nuucp</p>
+       </div>
+       <div id="pconsole" class="tab-pane">
+           <p>Usuario: pconsole</p>
+       </div>
+       <div id="srvproxy" class="tab-pane">
+           <p>Usuario: srvproxy</p>
+       </div>
+       <div id="esaadmin" class="tab-pane">
+           <p>Usuario: esaadmin</p>
+       </div>
+       <div id="sshd" class="tab-pane">
+           <p>Usuario: sshd</p>
+       </div>
+       <div id="nagios" class="tab-pane">
+           <p>Usuario: nagios</p>
+       </div>
+       <div id="critter" class="tab-pane">
+           <p>Usuario: critter</p>
+       </div>
+       <div id="ujanssen" class="tab-pane">
+           <p>Usuario: ujanssen</p>
+       </div>
+       <div id="nketelse" class="tab-pane">
+           <p>Usuario: nketelse</p>
+       </div>
+       <div id="ohannula" class="tab-pane">
+           <p>Usuario: ohannula</p>
+       </div>
+       <div id="rwolter" class="tab-pane">
+           <p>Usuario: rwolter</p>
+       </div>
+       <div id="kharrak" class="tab-pane">
+           <p>Usuario: kharrak</p>
+       </div>
+       <div id="hholst" class="tab-pane">
+           <p>Usuario: hholst</p>
+       </div>
+       <div id="edi" class="tab-pane">
+           <p>Usuario: edi</p>
+       </div>
+       <div id="ansiblec" class="tab-pane">
+           <p>Usuario: ansiblec</p>
+       </div>
+       <div id="foo" class="tab-pane">
+           <p>Usuario: foo</p>
+       </div>
+       <div id="miejf" class="tab-pane">
+           <p>Usuario: miejf</p>
+       </div>
+       <div id="miehy" class="tab-pane">
+           <p>Usuario: miehy</p>
+       </div>
+       <div id="extrr" class="tab-pane">
+           <p>Usuario: extrr</p>
+       </div>
+       <div id="extto" class="tab-pane">
+           <p>Usuario: extto</p>
+       </div>
+       <div id="extrn" class="tab-pane">
+           <p>Usuario: extrn</p>
+       </div>
+       <div id="extlt" class="tab-pane">
+           <p>Usuario: extlt</p>
+       </div>
+       <div id="extbl" class="tab-pane">
+           <p>Usuario: extbl</p>
+       </div>
+       <div id="micsw" class="tab-pane">
+           <p>Usuario: micsw</p>
+       </div>
+       <div id="hmcscan" class="tab-pane">
+           <p>Usuario: hmcscan</p>
+       </div>
+       <div id="emrichp" class="tab-pane">
+           <p>Usuario: emrichp</p>
+       </div>
+       <div id="hkentgen" class="tab-pane">
+           <p>Usuario: hkentgen</p>
+       </div>
+   </div>
+</div>
+<script>
+   $(document).ready(function(){
+       $("#userFilter").on("keyup", function() {
+           var value = $(this).val().toLowerCase();
+           $(".dropdown-menu li").filter(function() {
+               $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+           });
+       });
+   });
+</script>
+{% endblock %}
