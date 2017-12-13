@@ -25,7 +25,7 @@
 from subprocess import Popen, PIPE
 from openpyxl import Workbook
 from openpyxl.styles import Border, Side, PatternFill, Font, Alignment
-from collections import OrderedDict
+from collections import OrderedDict, MutableSet
 from pandas import read_excel
 # --------------------------------------------------------------- #
 ### END OF MODULE IMPORTS
@@ -53,68 +53,154 @@ FILENAME = 'em_lsusers.xlsx'
 
 ### START OF CLASS DEFINITIONS
 # --------------------------------------------------------------- #
+class UserHtmlTable():
+    def __init__(self, userdict):
+        self.l = 0
+        self.userdict = userdict
+        self.table_code = []
+
+        self.append_code('<table class="table table-hover table-responsive">')
+        #- Table Header code
+        self.append_code('<thead>')
+        self.append_code('<tr>')
+        for line_code in self.get_serversCode(): # Inserting the Server names as Table Header
+            self.append_code(line_code)
+        self.append_code('</tr>')
+        self.append_code('</thead>')
+        #- End of Table Header Code
+
+        #- Table Body code and attribute rows
+        self.append_code('<tbody>')
+        for attr in self.get_userAttr():  # Inserting the Attributes and values
+            for line_code in self.get_attrCode(attr):
+                self.append_code(line_code)
+        self.append_code('</tbody>')
+        # - End of Table Body Code
+        self.append_code('</table>')
+
+    def append_code(self, code):
+        if code[0] == '<' and code[1] != '/' and '</' in code:
+            self.table_code.append(t(self.l) + code)
+
+        elif code[0] == '<' and code[1] == '/':
+            self.l -= 1
+            self.table_code.append(t(self.l) + code)
+
+        elif code[0] == '<' and code[1] != '/':
+            self.table_code.append(t(self.l) + code)
+            self.l += 1
+        else:
+            print 'invalid HTML code'
+
+    def get_serversCode(self):
+        srvcode = []
+        srvcode.append('<th></th>') # Header's first column hast to be empty
+        for server in self.userdict.keys():
+            srvcode.append('<th>{}</th>'.format(server))
+        return srvcode
+
+    def get_userAttr(self):
+        attrs = list()
+        for srv in self.userdict.keys():
+            for attr in self.userdict[srv]:
+                attrs.append(attr)
+        attrs = list(OrderedDict.fromkeys(attrs))
+        return attrs
+
+    def get_attrCode(self,attr):
+        code = []
+        for server in self.userdict.keys():
+            code.append('<td>{}</td>'.format(self.userdict[server][attr]))
+        if len(set(code)) > 1:
+            code.insert(0,'<tr class="danger">')
+        else:
+            code.insert(0, '<tr>')
+
+        code.insert(1,'<th>{}</th>'.format(attr))
+        code.append('</tr>')
+        return code
+
+    def get_code(self):
+        for code_line in self.table_code:
+            print code_line
+
 
 # --------------------------------------------------------------- #
 ### END OF CLASS DEFINITIONS
 
 ### START OF FUNCTIONS DECLARATION
 # --------------------------------------------------------------- #
-def debugger(variables):
-	print 'Select the Variable you want to inspect:'
-	print variables.keys()
-	var = raw_input('Selection: ')
-	print 'Name:{}, Type: {}'.format(var, type(variables[var]))
-	print 'Value: {}'.format(variables[var])
-	print ""
-# --------------------------------------------------------------- #
-# --------------------------------------------------------------- #
 def find_in_col(ws, col, search_str):
-	for col in ws.iter_cols(min_col=col, max_col=col, max_row=ws.max_row):
-		for cell in col:
-			if cell.value == search_str:
-				return cell
-	return False
+    for col in ws.iter_cols(min_col=col, max_col=col, max_row=ws.max_row):
+        for cell in col:
+            if cell.value == search_str:
+                return cell
+    return False
 # --------------------------------------------------------------- #
 # --------------------------------------------------------------- #
 def find_in_row(ws, row, search_str):
-	for row in ws.iter_rows(min_row=row, max_col=ws.max_column, max_row=row):
-		for cell in row:
-			if cell.value == search_str:
-				return cell
-	return False
+    for row in ws.iter_rows(min_row=row, max_col=ws.max_column, max_row=row):
+        for cell in row:
+            if cell.value == search_str:
+                return cell
+    return False
 # --------------------------------------------------------------- #
 # --------------------------------------------------------------- #
 def get_max_col(ws, row):
-	max_col = 1
-	for col in ws.iter_cols(min_col=2, max_col=8000, min_row=row, max_row=row):
-		for cell in col:
-			if cell.value is None:
-				return max_col
-			else:
-				max_col += 1
-# --------------------------------------------------------------- #
-# --------------------------------------------------------------- #
-def get_filename():
-	global FILENAME
-	return FILENAME
-# --------------------------------------------------------------- #
-# --------------------------------------------------------------- #
-def set_filename(name):
-	global FILENAME
-	FILENAME = name
+    max_col = 1
+    for col in ws.iter_cols(min_col=2, max_col=8000, min_row=row, max_row=row):
+        for cell in col:
+            if cell.value is None:
+                return max_col
+            else:
+                max_col += 1
 # --------------------------------------------------------------- #
 # --------------------------------------------------------------- #
 def order_by_user(raw_users):
-	users = OrderedDict()
-	for host in raw_users.iterkeys():  # Hostname Level
-		for user, attr in raw_users[host]["users"].iteritems():  # User level
-			if user not in users:
-				users[user] = OrderedDict()
-			if host not in users[user]:
-				users[user][host] = OrderedDict()
-			users[user][host] = attr
-	return users
+    users = OrderedDict()
+    for host in raw_users.iterkeys():  # Hostname Level
+        for user, attr in raw_users[host]["users"].iteritems():  # User level
+            if user not in users:
+                users[user] = OrderedDict()
+            if host not in users[user]:
+                users[user][host] = OrderedDict()
+            users[user][host] = attr
+    return users
 # --------------------------------------------------------------- #
+
+def t(n):
+    '''
+    To return a number of tabulations, given the paramenter n
+    :param n - tab multipler. Use 0 to none
+    '''
+    return ''.join(['    '] * n)
+# --------------------------------------------------------------- #
+def mk_html_table(user_data):
+    l = 0
+    table_code = []
+    opened_tags = []
+    closed_tags = []
+
+    def append_code(code):
+        l=0
+        if code[0] == '<' and code[1] == '/':
+            closed_tags.append(code.split(' ')[0].strip('</'))
+            table_code.append(t(l)+code)
+            l = - 1
+        elif code[0] == '<' and code[1] != '/':
+            opened_tags.append(code.split(' ')[0].strip('</'))
+            table_code.append(t(l)+code)
+            l = + 1
+        else:
+            print 'invalid HTML code'
+
+    append_code('<table class="table table-hover table-responsive">')
+    append_code('<thead>')
+    append_code('<tr>')
+
+    return table_code
+# --------------------------------------------------------------- #
+
 
 # --------------------------------------------------------------- #
 def update_report(wb, user, attr, attr_ref):
@@ -196,7 +282,6 @@ def lsusers(targ_hosts, fulllist=False, user_filter="ALL"):
 
 	# Calling Ansible process
 	output = Popen(ans_cmd, stdout=PIPE, stderr=PIPE)
-
 	msg_handler = ''
 
 	# Parsing the process output
@@ -271,59 +356,65 @@ def mksheet(raw_users):
 # --------------------------------------------------------------- #
 # --------------------------------------------------------------- #
 def mkhtml():
-    """
-    Builds an html Jinja2 Template out from the 'lsusers' function output,
-    which comes as a dictionary tree.
-    """
-    # Preparing the HTML Static content
-    html_file = open('../tools/blueprints/page/templates/users.html', 'w+')
-    html_file.write("{% extends 'layouts/base.html' %}\n")
-    html_file.write('{% block title %} Easy	Manager - Users	{% endblock %}\n')
-    html_file.write('\n')
-    html_file.write('{% block body %}\n')
-    excel_file = read_excel('em_lsusers.xlsx', None)
-    users = excel_file.keys() # list containing all users retrieved by Ansible
+	"""
+	Builds an html Jinja2 Template out from the 'lsusers' function output,
+	which comes as a dictionary tree.
+	"""
 
-    ### GENERATING THE HTML CODE ###
-    html_file.write('<div class="container" >\n')
+	raw_users = OrderedDict([('dehamsp40', OrderedDict([('exec_rc', 'rc=0'), ('exec_msg', 'SUCCESS'), ('users', OrderedDict([('root', OrderedDict([('id', u'0'), ('pgrp', u'system'), ('groups', u'system,bin,sys,security,cron,audit,lp'), ('home', u'/'), ('shell', u'/usr/bin/ksh')])), ('daemon', OrderedDict([('id', u'1'), ('pgrp', u'staff'), ('groups', u'staff'), ('home', u'/etc')])), ('bin', OrderedDict([('id', u'2'), ('pgrp', u'bin'), ('groups', u'bin,sys,adm'), ('home', u'/bin')])), ('sys', OrderedDict([('id', u'3'), ('pgrp', u'sys'), ('groups', u'sys'), ('home', u'/usr/sys')])), ('adm', OrderedDict([('id', u'4'), ('pgrp', u'adm'), ('groups', u'adm'), ('home', u'/var/adm')])), ('uucp', OrderedDict([('id', u'5'), ('pgrp', u'uucp'), ('groups', u'uucp'), ('home', u'/usr/lib/uucp')])), ('guest', OrderedDict([('id', u'100'), ('pgrp', u'usr'), ('groups', u'usr'), ('home', u'/home/guest')])), ('nobody', OrderedDict([('id', u'4294967294'), ('pgrp', u'nobody'), ('groups', u'nobody'), ('home', u'/')])), ('lpd', OrderedDict([('id', u'9'), ('pgrp', u'nobody'), ('groups', u'nobody'), ('home', u'/')])), ('lp', OrderedDict([('id', u'11'), ('pgrp', u'lp'), ('groups', u'lp,printq'), ('home', u'/var/spool/lp'), ('shell', u'/bin/false')])), ('invscout', OrderedDict([('id', u'6'), ('pgrp', u'invscout'), ('groups', u'invscout'), ('home', u'/var/adm/invscout'), ('shell', u'/usr/bin/ksh')])), ('snapp', OrderedDict([('id', u'200'), ('pgrp', u'snapp'), ('groups', u'snapp'), ('home', u'/usr/sbin/snapp'), ('shell', u'/usr/sbin/snappd'), ('gecos', u'snapp login user')])), ('ipsec', OrderedDict([('id', u'230'), ('pgrp', u'staff'), ('groups', u'staff'), ('home', u'/etc/ipsec'), ('shell', u'/usr/bin/ksh')])), ('nuucp', OrderedDict([('id', u'7'), ('pgrp', u'uucp'), ('groups', u'uucp'), ('home', u'/var/spool/uucppublic'), ('shell', u'/usr/sbin/uucp/uucico'), ('gecos', u'uucp login user')])), ('pconsole', OrderedDict([('id', u'8'), ('pgrp', u'system'), ('groups', u'system,pconsole'), ('home', u'/var/adm/pconsole'), ('shell', u'/usr/bin/ksh')])), ('srvproxy', OrderedDict([('id', u'202'), ('pgrp', u'system'), ('groups', u'system,staff'), ('home', u'/home/srvproxy'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Service Proxy Daemon')])), ('esaadmin', OrderedDict([('id', u'10'), ('pgrp', u'system'), ('groups', u'system,staff'), ('home', u'/var/esa'), ('shell', u'/usr/bin/ksh')])), ('sshd', OrderedDict([('id', u'203'), ('pgrp', u'sshd'), ('groups', u'sshd,staff'), ('home', u'/var/empty'), ('shell', u'/usr/bin/ksh')])), ('nagios', OrderedDict([('id', u'5000'), ('pgrp', u'nagios'), ('groups', u'nagios,staff'), ('home', u'/usr/local/nagios'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Nagios Admin User')])), ('critter', OrderedDict([('id', u'888'), ('pgrp', u'knadmin'), ('groups', u'knadmin'), ('home', u'/local/home/critter'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Carsten Ritter, GI-ID')])), ('ujanssen', OrderedDict([('id', u'330'), ('pgrp', u'knadmin'), ('groups', u'knadmin'), ('home', u'/local/home/ujanssen'), ('shell', u'/usr/bin/bash'), ('gecos', u'Urs Janssen, GI-ID')])), ('nketelse', OrderedDict([('id', u'355'), ('pgrp', u'knadmin'), ('groups', u'knadmin'), ('home', u'/local/home/nketelse'), ('shell', u'/usr/bin/bash'), ('gecos', u'Nils Ketelsen, GI-ID')])), ('ohannula', OrderedDict([('id', u'11032'), ('pgrp', u'knadmin'), ('groups', u'knadmin'), ('home', u'/local/home/ohannula'), ('shell', u'/usr/bin/bash'), ('gecos', u'Olev Hannula, GI-ID')])), ('rwolter', OrderedDict([('id', u'1000001'), ('pgrp', u'knadmin'), ('groups', u'knadmin'), ('home', u'/local/home/rwolter'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Rudolf Wolter, GI-ID')])), ('kharrak', OrderedDict([('id', u'8396000'), ('pgrp', u'knadmin'), ('groups', u'knadmin'), ('home', u'/local/home/kharrak'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Karl-Hans Arrak, GI-ID')])), ('hholst', OrderedDict([('id', u'83956021'), ('pgrp', u'knadmin'), ('groups', u'knadmin'), ('home', u'/local/home/hholst'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Henrik Holst, HAM GI-ID')])), ('edi', OrderedDict([('id', u'201'), ('pgrp', u'edi'), ('groups', u'edi,ediops'), ('home', u'/home/edi'), ('shell', u'/usr/bin/ksh'), ('gecos', u'edi')])), ('ansiblec', OrderedDict([('id', u'501'), ('pgrp', u'ansible'), ('groups', u'ansible,staff'), ('home', u'/home/ansiblec'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Ansible Client User'), ('roles', u'')]))]))])), ('dehamsp20', OrderedDict([('exec_rc', 'rc=0'), ('exec_msg', 'SUCCESS'), ('users', OrderedDict([('root', OrderedDict([('id', u'0'), ('pgrp', u'system'), ('groups', u'system,bin,sys,security,cron,audit,lp'), ('home', u'/'), ('shell', u'/usr/bin/ksh')])), ('daemon', OrderedDict([('id', u'1'), ('pgrp', u'staff'), ('groups', u'staff,daemon'), ('home', u'/etc')])), ('bin', OrderedDict([('id', u'2'), ('pgrp', u'bin'), ('groups', u'bin,sys,adm'), ('home', u'/bin')])), ('sys', OrderedDict([('id', u'3'), ('pgrp', u'sys'), ('groups', u'sys'), ('home', u'/usr/sys')])), ('adm', OrderedDict([('id', u'4'), ('pgrp', u'adm'), ('groups', u'adm'), ('home', u'/var/adm')])), ('guest', OrderedDict([('id', u'100'), ('pgrp', u'usr'), ('groups', u'usr'), ('home', u'/home/guest')])), ('nobody', OrderedDict([('id', u'4294967294'), ('pgrp', u'nobody'), ('groups', u'nobody'), ('home', u'/')])), ('lpd', OrderedDict([('id', u'9'), ('pgrp', u'nobody'), ('groups', u'nobody'), ('home', u'/')])), ('lp', OrderedDict([('id', u'11'), ('pgrp', u'aconn'), ('groups', u'aconn,printq,lp'), ('home', u'/var/spool/lp'), ('shell', u'/bin/false')])), ('invscout', OrderedDict([('id', u'10'), ('pgrp', u'mqm'), ('groups', u'mqm,invscout'), ('home', u'/var/adm/invscout'), ('shell', u'/usr/bin/ksh')])), ('ipsec', OrderedDict([('id', u'314'), ('pgrp', u'staff'), ('groups', u'staff'), ('home', u'/etc/ipsec'), ('shell', u'/usr/bin/ksh')])), ('sshd', OrderedDict([('id', u'8'), ('pgrp', u'sshd'), ('groups', u'sshd,staff'), ('home', u'/var/empty'), ('shell', u'/usr/bin/ksh')])), ('edi', OrderedDict([('id', u'201'), ('pgrp', u'edi'), ('groups', u'edi,staff,fas,remote,mqm,ediinst'), ('home', u'/home/edi'), ('shell', u'/bin/ksh'), ('gecos', u'edi')])), ('edi0', OrderedDict([('id', u'301'), ('pgrp', u'edi'), ('groups', u'edi,staff,mqm,ediinst'), ('home', u'/home/edi0'), ('shell', u'/usr/bin/ksh'), ('gecos', u'edi0')])), ('edi2', OrderedDict([('id', u'303'), ('pgrp', u'edi'), ('groups', u'edi,staff,ediinst'), ('home', u'/home/edi2'), ('shell', u'/usr/bin/ksh'), ('gecos', u'edi2')])), ('edi3', OrderedDict([('id', u'321'), ('pgrp', u'edi'), ('groups', u'edi,staff,mqm,ediinst'), ('home', u'/home/edi3'), ('shell', u'/usr/bin/ksh'), ('gecos', u'edi3')])), ('edi4', OrderedDict([('id', u'323'), ('pgrp', u'edi'), ('groups', u'edi,staff,mqm,ediinst'), ('home', u'/home/edi4'), ('shell', u'/usr/bin/ksh'), ('gecos', u'edi4')])), ('edi5', OrderedDict([('id', u'380'), ('pgrp', u'edi'), ('groups', u'edi,staff,mqm,ediinst'), ('home', u'/home/edi5'), ('shell', u'/usr/bin/ksh'), ('gecos', u'edi5')])), ('extdr', OrderedDict([('id', u'243'), ('pgrp', u'edi'), ('groups', u'edi,staff,gscpom,ediops'), ('home', u'/home/extdr'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Daniel Ritter')])), ('micsw', OrderedDict([('id', u'211'), ('pgrp', u'edi'), ('groups', u'edi,gscpom,ediops'), ('home', u'/home/micsw'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Sven Willenbuecher')])), ('miejf', OrderedDict([('id', u'298'), ('pgrp', u'edi'), ('groups', u'edi,staff,gscpom,ediops'), ('home', u'/home/miejf'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Jurij Fajnberg')])), ('mieref', OrderedDict([('id', u'209'), ('pgrp', u'edi'), ('groups', u'edi,staff'), ('home', u'/home/mieref'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Referenz Account')])), ('oracle', OrderedDict([('id', u'332'), ('pgrp', u'dba'), ('groups', u'dba,edi'), ('home', u'/home/oracle'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Oracle admin')])), ('uucp', OrderedDict([('id', u'5'), ('pgrp', u'uucp'), ('groups', u'uucp,staff'), ('home', u'/usr/lib/uucp'), ('shell', u'/usr/bin/ksh'), ('gecos', u'DE;S;;213375;;Hermann Handick;;OS')])), ('nagios', OrderedDict([('id', u'5000'), ('pgrp', u'nagios'), ('groups', u'nagios,mqm'), ('home', u'/usr/local/nagios'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Nagios Admin User')])), ('critter', OrderedDict([('id', u'888'), ('pgrp', u'knadmin'), ('groups', u'knadmin,staff'), ('home', u'/home/critter'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Carsten Ritter, GI-ID')])), ('edi1', OrderedDict([('id', u'226'), ('pgrp', u'edi'), ('groups', u'edi,staff,mqm,ediinst'), ('home', u'/home/edi1'), ('shell', u'/usr/bin/ksh'), ('gecos', u'edi1')])), ('ujanssen', OrderedDict([('id', u'330'), ('pgrp', u'knadmin'), ('groups', u'knadmin,system,staff,security,shutdown'), ('home', u'/home/ujanssen'), ('shell', u'/usr/bin/bash'), ('gecos', u'Urs Janssen, GI-ID')])), ('nketelse', OrderedDict([('id', u'355'), ('pgrp', u'knadmin'), ('groups', u'knadmin,system,staff,security,shutdown'), ('home', u'/home/nketelse'), ('shell', u'/usr/bin/bash'), ('gecos', u'Nils Ketelsen, GI-ID')])), ('ohannula', OrderedDict([('id', u'11032'), ('pgrp', u'knadmin'), ('groups', u'knadmin,system,staff,security,shutdown'), ('home', u'/home/ohannula'), ('shell', u'/usr/bin/bash'), ('gecos', u'Olev Hannula, GI-ID')])), ('edi6', OrderedDict([('id', u'408'), ('pgrp', u'edi'), ('groups', u'edi,staff,mqm,ediinst'), ('home', u'/home/edi6'), ('shell', u'/usr/bin/ksh'), ('gecos', u'edi6')])), ('extrr', OrderedDict([('id', u'409'), ('pgrp', u'edi'), ('groups', u'edi,staff,gscpom,ediops'), ('home', u'/home/extrr'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Reinhold Redel')])), ('extto', OrderedDict([('id', u'410'), ('pgrp', u'edi'), ('groups', u'edi,staff,gscpom,ediops'), ('home', u'/home/extto'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Theo Ohnsorge')])), ('rwolter', OrderedDict([('id', u'1000001'), ('pgrp', u'knadmin'), ('groups', u'knadmin,system,staff,security,shutdown'), ('home', u'/home/rwolter'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Rudolf Wolter, GI-ID')])), ('miehy', OrderedDict([('id', u'433'), ('pgrp', u'edi'), ('groups', u'edi,gscpom,ediops'), ('home', u'/home/miehy'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Halberd Yao')])), ('kharrak', OrderedDict([('id', u'8396000'), ('pgrp', u'knadmin'), ('groups', u'knadmin,system,staff,security,shutdown'), ('home', u'/home/kharrak'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Karl-Hans Arrak, GI-ID')])), ('extjr', OrderedDict([('id', u'83956014'), ('pgrp', u'edi'), ('groups', u'edi,staff,gscpom'), ('home', u'/home/extjr'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Joachim Raue')])), ('hholst', OrderedDict([('id', u'461'), ('pgrp', u'knadmin'), ('groups', u'knadmin,staff'), ('home', u'/home/hholst'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Henrik Holst, HAM GI-ID')])), ('snapp', OrderedDict([('id', u'462'), ('pgrp', u'snapp'), ('groups', u'snapp'), ('home', u'/usr/sbin/snapp'), ('shell', u'/usr/bin/ksh'), ('gecos', u'snapp login user')])), ('extjg', OrderedDict([('id', u'464'), ('pgrp', u'edi'), ('groups', u'edi,gscpom,ediops'), ('home', u'/home/extjg'), ('shell', u'/usr/bin/ksh'), ('gecos', u'external.jacek.golek@kuehne-nagel.com')])), ('extms', OrderedDict([('id', u'465'), ('pgrp', u'edi'), ('groups', u'edi,staff'), ('home', u'/home/extms'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Michael Schoene')])), ('extbl', OrderedDict([('id', u'466'), ('pgrp', u'edi'), ('groups', u'edi,staff,gscpom,ediops'), ('home', u'/home/extbl'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Bernd Laser')])), ('gscpom', OrderedDict([('id', u'467'), ('pgrp', u'edi'), ('groups', u'edi,staff,fas,remote,mqm'), ('home', u'/home/gscpom'), ('shell', u'/usr/bin/ksh'), ('gecos', u'gscpom edi user')])), ('hkentgen', OrderedDict([('id', u'468'), ('pgrp', u'knadmin'), ('groups', u'knadmin,staff'), ('home', u'/home/hkentgen'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Heinz Kentgens, GI-ID')])), ('extrn', OrderedDict([('id', u'83956030'), ('pgrp', u'edi'), ('groups', u'edi,staff,gscpom,ediops'), ('home', u'/home/extrn'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Ren\xe9 Neumann')])), ('ansiblec', OrderedDict([('id', u'501'), ('pgrp', u'ansible'), ('groups', u'ansible,staff'), ('home', u'/home/ansiblec'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Ansible Client User for OSY'), ('roles', u'')])), ('extfs', OrderedDict([('id', u'64605'), ('pgrp', u'edi'), ('groups', u'edi,staff,gscpom,ediops'), ('home', u'/home/extfs'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Frank Seitz')])), ('extsi', OrderedDict([('id', u'64606'), ('pgrp', u'staff'), ('groups', u'staff'), ('home', u'/home/extsi'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Stanislav Ignatev')])), ('extas', OrderedDict([('id', u'64607'), ('pgrp', u'staff'), ('groups', u'staff'), ('home', u'/home/extas'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Alexander Slobodenyuk')])), ('extati', OrderedDict([('id', u'64608'), ('pgrp', u'staff'), ('groups', u'staff'), ('home', u'/home/extati'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Aleksei Tirman')])), ('extjs', OrderedDict([('id', u'64609'), ('pgrp', u'staff'), ('groups', u'staff'), ('home', u'/home/extjs'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Jishu Sharma')])), ('tllak', OrderedDict([('id', u'83956039'), ('pgrp', u'edi'), ('groups', u'edi'), ('home', u'/home/tllak'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Alo Kobin')])), ('ftpedi', OrderedDict([('id', u'475'), ('pgrp', u'edi'), ('groups', u'edi,staff'), ('home', u'/ib/dat/download/ftp'), ('shell', u'/usr/bin/ksh')])), ('jenkins', OrderedDict([('id', u'10254'), ('pgrp', u'jenkins'), ('groups', u'jenkins,staff'), ('home', u'/home/jenkins'), ('shell', u'/usr/bin/ksh')])), ('tllaa', OrderedDict([('id', u'249'), ('pgrp', u'edi'), ('groups', u'edi'), ('home', u'/home/tllaa'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Aleksandr Arepjev')])), ('tllsp', OrderedDict([('id', u'407'), ('pgrp', u'edi'), ('groups', u'edi,cron,gscpom,ediops'), ('home', u'/home/tllsp'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Sven Pajumagi')])), ('tlltl', OrderedDict([('id', u'229'), ('pgrp', u'edi'), ('groups', u'edi,cron,gscpom,ediops'), ('home', u'/home/tlltl'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Tanel Likk')])), ('tllpl', OrderedDict([('id', u'447'), ('pgrp', u'edi'), ('groups', u'edi,cron,gscpom'), ('home', u'/home/tllpl'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Priit Lohmus')])), ('tlljm', OrderedDict([('id', u'15183'), ('pgrp', u'edi'), ('groups', u'edi,cron,gscpom'), ('home', u'/home/tlljm'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Jakov Motsenov')])), ('nginx', OrderedDict([('id', u'64600'), ('pgrp', u'nginx'), ('groups', u'nginx,staff,edi'), ('home', u'/home/nginx'), ('shell', u'/usr/bin/ksh'), ('gecos', u'NGINX User')])), ('extrs', OrderedDict([('id', u'64613'), ('pgrp', u'edi'), ('groups', u'edi,staff,gscpom,ediops'), ('home', u'/home/extrs'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Ronald Sedelies')])), ('miecg', OrderedDict([('id', u'64610'), ('pgrp', u'edi'), ('groups', u'edi,staff,gscpom,ediops'), ('home', u'/home/miecg'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Christian Gebauer')])), ('extnl', OrderedDict([('id', u'64615'), ('pgrp', u'edi'), ('groups', u'edi,gscpom,ediops'), ('home', u'/home/extnl'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Neven Luetic')]))]))])), ('dehamsp36', OrderedDict([('exec_rc', 'rc=0'), ('exec_msg', 'SUCCESS'), ('users', OrderedDict([('root', OrderedDict([('id', u'0'), ('pgrp', u'system'), ('groups', u'system,bin,sys,security,cron,audit,lp'), ('home', u'/'), ('shell', u'/usr/bin/ksh')])), ('daemon', OrderedDict([('id', u'1'), ('pgrp', u'staff'), ('groups', u'staff'), ('home', u'/etc')])), ('bin', OrderedDict([('id', u'2'), ('pgrp', u'bin'), ('groups', u'bin,sys,adm'), ('home', u'/bin')])), ('sys', OrderedDict([('id', u'3'), ('pgrp', u'sys'), ('groups', u'sys'), ('home', u'/usr/sys')])), ('adm', OrderedDict([('id', u'4'), ('pgrp', u'adm'), ('groups', u'adm'), ('home', u'/var/adm')])), ('uucp', OrderedDict([('id', u'5'), ('pgrp', u'uucp'), ('groups', u'uucp'), ('home', u'/usr/lib/uucp')])), ('guest', OrderedDict([('id', u'100'), ('pgrp', u'usr'), ('groups', u'usr'), ('home', u'/home/guest')])), ('nobody', OrderedDict([('id', u'4294967294'), ('pgrp', u'nobody'), ('groups', u'nobody'), ('home', u'/')])), ('lpd', OrderedDict([('id', u'9'), ('pgrp', u'nobody'), ('groups', u'nobody'), ('home', u'/')])), ('lp', OrderedDict([('id', u'11'), ('pgrp', u'lp'), ('groups', u'lp,printq'), ('home', u'/var/spool/lp'), ('shell', u'/bin/false')])), ('invscout', OrderedDict([('id', u'6'), ('pgrp', u'invscout'), ('groups', u'invscout'), ('home', u'/var/adm/invscout'), ('shell', u'/usr/bin/ksh')])), ('snapp', OrderedDict([('id', u'200'), ('pgrp', u'snapp'), ('groups', u'snapp'), ('home', u'/usr/sbin/snapp'), ('shell', u'/usr/sbin/snappd'), ('gecos', u'snapp login user')])), ('ipsec', OrderedDict([('id', u'201'), ('pgrp', u'staff'), ('groups', u'staff'), ('home', u'/etc/ipsec'), ('shell', u'/usr/bin/ksh')])), ('nuucp', OrderedDict([('id', u'7'), ('pgrp', u'uucp'), ('groups', u'uucp'), ('home', u'/var/spool/uucppublic'), ('shell', u'/usr/sbin/uucp/uucico'), ('gecos', u'uucp login user')])), ('pconsole', OrderedDict([('id', u'8'), ('pgrp', u'system'), ('groups', u'system,pconsole'), ('home', u'/var/adm/pconsole'), ('shell', u'/usr/bin/ksh')])), ('esaadmin', OrderedDict([('id', u'10'), ('pgrp', u'system'), ('groups', u'system,staff'), ('home', u'/var/esa'), ('shell', u'/usr/bin/ksh')])), ('sshd', OrderedDict([('id', u'202'), ('pgrp', u'sshd'), ('groups', u'sshd,staff'), ('home', u'/var/empty'), ('shell', u'/usr/bin/ksh')])), ('nagios', OrderedDict([('id', u'5000'), ('pgrp', u'nagios'), ('groups', u'nagios'), ('home', u'/usr/local/nagios'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Nagios Admin user')])), ('hmcscan', OrderedDict([('id', u'9999'), ('pgrp', u'staff'), ('groups', u'staff'), ('home', u'/opt/hmcscanner'), ('shell', u'/usr/bin/ksh'), ('gecos', u'User for HMCscanner tool')])), ('rwolter', OrderedDict([('id', u'1000001'), ('pgrp', u'knadmin'), ('groups', u'knadmin,staff'), ('home', u'/home/rwolter'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Rudolf Wolter, GD-ID')])), ('critter', OrderedDict([('id', u'203'), ('pgrp', u'knadmin'), ('groups', u'knadmin,staff'), ('home', u'/home/critter'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Carsten Ritter, GI-ID')])), ('emrichp', OrderedDict([('id', u'204'), ('pgrp', u'knadmin'), ('groups', u'knadmin'), ('home', u'/home/emrichp'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Peter Emrich')])), ('srvproxy', OrderedDict([('id', u'205'), ('pgrp', u'system'), ('groups', u'system,staff'), ('home', u'/home/srvproxy'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Service Proxy Daemon')])), ('hholst', OrderedDict([('id', u'206'), ('pgrp', u'knadmin'), ('groups', u'knadmin,staff'), ('home', u'/home/hholst'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Henrik Holst, HAM GI-ID')])), ('hkentgen', OrderedDict([('id', u'207'), ('pgrp', u'knadmin'), ('groups', u'knadmin,staff'), ('home', u'/home/hkentgen'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Heinz Kentgens, GI-ID')])), ('ansiblec', OrderedDict([('id', u'501'), ('pgrp', u'ansible'), ('groups', u'ansible,staff'), ('home', u'/home/ansiblec'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Ansible Client User for OSY'), ('roles', u'')]))]))])), ('denotsp36', OrderedDict([('exec_rc', 'rc=0'), ('exec_msg', 'SUCCESS'), ('users', OrderedDict([('root', OrderedDict([('id', u'0'), ('pgrp', u'system'), ('groups', u'system,bin,sys,security,cron,audit,lp'), ('home', u'/'), ('shell', u'/usr/bin/ksh')])), ('daemon', OrderedDict([('id', u'1'), ('pgrp', u'staff'), ('groups', u'staff'), ('home', u'/etc')])), ('bin', OrderedDict([('id', u'2'), ('pgrp', u'bin'), ('groups', u'bin,sys,adm'), ('home', u'/bin')])), ('sys', OrderedDict([('id', u'3'), ('pgrp', u'sys'), ('groups', u'sys'), ('home', u'/usr/sys')])), ('adm', OrderedDict([('id', u'4'), ('pgrp', u'adm'), ('groups', u'adm'), ('home', u'/var/adm')])), ('uucp', OrderedDict([('id', u'5'), ('pgrp', u'uucp'), ('groups', u'uucp'), ('home', u'/usr/lib/uucp')])), ('guest', OrderedDict([('id', u'100'), ('pgrp', u'usr'), ('groups', u'usr'), ('home', u'/home/guest')])), ('nobody', OrderedDict([('id', u'4294967294'), ('pgrp', u'nobody'), ('groups', u'nobody'), ('home', u'/')])), ('lpd', OrderedDict([('id', u'9'), ('pgrp', u'nobody'), ('groups', u'nobody'), ('home', u'/')])), ('lp', OrderedDict([('id', u'11'), ('pgrp', u'lp'), ('groups', u'lp,printq'), ('home', u'/var/spool/lp'), ('shell', u'/bin/false')])), ('invscout', OrderedDict([('id', u'6'), ('pgrp', u'invscout'), ('groups', u'invscout'), ('home', u'/var/adm/invscout'), ('shell', u'/usr/bin/ksh')])), ('snapp', OrderedDict([('id', u'200'), ('pgrp', u'snapp'), ('groups', u'snapp'), ('home', u'/usr/sbin/snapp'), ('shell', u'/usr/sbin/snappd'), ('gecos', u'snapp login user')])), ('ipsec', OrderedDict([('id', u'201'), ('pgrp', u'staff'), ('groups', u'staff'), ('home', u'/etc/ipsec'), ('shell', u'/usr/bin/ksh')])), ('nuucp', OrderedDict([('id', u'7'), ('pgrp', u'uucp'), ('groups', u'uucp'), ('home', u'/var/spool/uucppublic'), ('shell', u'/usr/sbin/uucp/uucico'), ('gecos', u'uucp login user')])), ('pconsole', OrderedDict([('id', u'8'), ('pgrp', u'system'), ('groups', u'system,pconsole'), ('home', u'/var/adm/pconsole'), ('shell', u'/usr/bin/ksh')])), ('esaadmin', OrderedDict([('id', u'10'), ('pgrp', u'system'), ('groups', u'system,staff'), ('home', u'/var/esa'), ('shell', u'/usr/bin/ksh')])), ('sshd', OrderedDict([('id', u'202'), ('pgrp', u'sshd'), ('groups', u'sshd,staff'), ('home', u'/var/empty'), ('shell', u'/usr/bin/ksh')])), ('nagios', OrderedDict([('id', u'10101'), ('pgrp', u'nagios'), ('groups', u'nagios'), ('home', u'/usr/local/nagios'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Nagios Admin user')])), ('rwolter', OrderedDict([('id', u'1000001'), ('pgrp', u'knadmin'), ('groups', u'knadmin,staff'), ('home', u'/home/rwolter'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Rudolf Wolter, GD-ID')])), ('critter', OrderedDict([('id', u'203'), ('pgrp', u'knadmin'), ('groups', u'knadmin,staff'), ('home', u'/home/critter'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Carsten Ritter, GI-ID')])), ('emrichp', OrderedDict([('id', u'204'), ('pgrp', u'knadmin'), ('groups', u'knadmin,staff'), ('home', u'/home/emrichp'), ('shell', u'/usr/bin/ksh')])), ('srvproxy', OrderedDict([('id', u'205'), ('pgrp', u'system'), ('groups', u'system,staff'), ('home', u'/home/srvproxy'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Service Proxy Daemon')])), ('hholst', OrderedDict([('id', u'206'), ('pgrp', u'knadmin'), ('groups', u'knadmin,staff'), ('home', u'/home/hholst'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Henrik Holst, HAM GI-ID')])), ('ansiblec', OrderedDict([('id', u'501'), ('pgrp', u'ansible'), ('groups', u'ansible,staff'), ('home', u'/home/ansiblec'), ('shell', u'/usr/bin/ksh'), ('gecos', u'Ansible Client User for OSY'), ('roles', u'')]))]))]))])
+	users = order_by_user(raw_users)
 
-    # Creating the Report Button
-    html_file.write('   <a href="#Report" class ="btn btn-primary" role="button">Report</a>\n')
+	# Preparing the HTML Static content
+	html_file = open('../tools/blueprints/page/templates/users.html', 'w+')
+	html_file.write("{% extends 'layouts/base.html' %}\n")
+	html_file.write('{% block title %} Easy	Manager - Users	{% endblock %}\n')
+	html_file.write('\n')
+	html_file.write('{% block body %}\n')
+	excel_file = read_excel('em_lsusers.xlsx', None)
+	#users = excel_file.keys() # list containing all users retrieved by Ansible
 
-    # Creating the dropdown Button with user filter
-    html_file.write('   <div class="dropdown">\n')
-    html_file.write('       <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Users\n')
-    html_file.write('       <span class="caret"></span></button>\n')
-    html_file.write('       <ul class="dropdown-menu">\n')
-    html_file.write('           <input class="form-control" id="userFilter" type="text" placeholder="Filter...">\n')
-    for user in users[1:]:
-        html_file.write('           <li ><a data-toggle="pill" href="#{}">{}</a></li>\n'.format(user, user))
-    html_file.write('       </ul>\n')
-    html_file.write('   </div>\n')
+	### GENERATING THE HTML CODE ###
+	html_file.write('<div class="container" >\n')
 
-    # looping over each user's tab and creating the appropriate HTML code
-    html_file.write('   <div class="tab-content">\n')
-    for user in excel_file.keys():
-        html_file.write('       <div id="{}" class="tab-pane">\n'.format(user))
-        html_file.write('           <p>Usuario: ' + user + '</p>\n')
-        #html = read_excel('em_lsusers.xlsx', user).to_html().encode('utf-8').split('\n')
-        html_file.write('       </div>\n')
-    html_file.write('   </div>\n')
-    html_file.write('</div>\n')
-    html_file.write('<script>\n')
-    html_file.write('   $(document).ready(function(){\n')
-    html_file.write('       $("#userFilter").on("keyup", function() {\n')
-    html_file.write('           var value = $(this).val().toLowerCase();\n')
-    html_file.write('           $(".dropdown-menu li").filter(function() {\n')
-    html_file.write('               $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)\n')
-    html_file.write('           });\n')
-    html_file.write('       });\n')
-    html_file.write('   });\n')
-    html_file.write('</script>\n')
-    ### END OF THE HTML CODE ###
+	# Creating the Report Button
+	html_file.write('   <a href="#Report" class ="btn btn-primary" role="button">Report</a>\n')
 
-    html_file.write("{% endblock %}\n")
-    html_file.close()
+	# Creating the dropdown Button with user filter
+	html_file.write('   <div class="dropdown">\n')
+	html_file.write('       <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Users\n')
+	html_file.write('       <span class="caret"></span></button>\n')
+	html_file.write('       <ul class="dropdown-menu">\n')
+	html_file.write('           <input class="form-control" id="userFilter" type="text" placeholder="Filter...">\n')
+	for user in users.iterkeys():
+		html_file.write('           <li ><a data-toggle="pill" href="#{}">{}</a></li>\n'.format(user, user))
+	html_file.write('       </ul>\n')
+	html_file.write('   </div>\n')
+
+	# looping over each user's tab and creating the appropriate HTML code
+	html_file.write('   <div class="tab-content">\n')
+	for user in users.iterkeys():
+		html_file.write('       <div id="{}" class="tab-pane">\n'.format(user))
+		#html = read_excel('em_lsusers.xlsx', user).to_html().encode('utf-8')
+		#print html
+		html_file.write(mk_html_table(users[user])) # Parsing the table's HTML code.
+		html_file.write('\n')
+		html_file.write('       </div>\n')
+	html_file.write('   </div>\n')
+	html_file.write('</div>\n')
+	html_file.write('<script>\n')
+	html_file.write('   $(document).ready(function(){\n')
+	html_file.write('       $("#userFilter").on("keyup", function() {\n')
+	html_file.write('           var value = $(this).val().toLowerCase();\n')
+	html_file.write('           $(".dropdown-menu li").filter(function() {\n')
+	html_file.write('               $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)\n')
+	html_file.write('           });\n')
+	html_file.write('       });\n')
+	html_file.write('   });\n')
+	html_file.write('</script>\n')
+	### END OF THE HTML CODE ###
+
+	html_file.write("{% endblock %}\n")
+	html_file.close()
 
 
 # --------------------------------------------------------------- #
