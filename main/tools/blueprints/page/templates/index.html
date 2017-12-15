@@ -2,63 +2,22 @@
 {% block title %} Easy	Manager - Home	{% endblock %}
 
 {% block body %}
-
-<table class="table table-hover table-responsive">
-    <thead>
-        <tr>
-            <th></th>
-            <th>dehamsp40</th>
-            <th>dehamsp20</th>
-            <th>dehamsp36</th>
-            <th>denotsp36</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th>id</th>
-            <td>1000001</td>
-            <td>1000001</td>
-            <td>1000001</td>
-            <td>1000001</td>
-        </tr>
-        <tr>
-            <th>pgrp</th>
-            <td>knadmin</td>
-            <td>knadmin</td>
-            <td>knadmin</td>
-            <td>knadmin</td>
-        </tr>
-        <tr class="warning">
-            <th>groups</th>
-            <td>knadmin</td>
-            <td>knadmin,system,staff,security,shutdown</td>
-            <td>knadmin,staff</td>
-            <td>knadmin,staff</td>
-        </tr>
-        <tr class="warning">
-            <th>home</th>
-            <td>/local/home/rwolter</td>
-            <td>/home/rwolter</td>
-            <td>/home/rwolter</td>
-            <td>/home/rwolter</td>
-        </tr>
-        <tr>
-            <th>shell</th>
-            <td>/usr/bin/ksh</td>
-            <td>/usr/bin/ksh</td>
-            <td>/usr/bin/ksh</td>
-            <td>/usr/bin/ksh</td>
-        </tr>
-        <tr class="warning">
-            <th>gecos</th>
-            <td>Rudolf Wolter, GI-ID</td>
-            <td>Rudolf Wolter, GI-ID</td>
-            <td>Rudolf Wolter, GD-ID</td>
-            <td>Rudolf Wolter, GD-ID</td>
-        </tr>
-    </tbody>
-</table>
-
-
+<div class="container btn-group">
+    <a href="#Report" class="btn btn-primary" type="button" role="button">Report</a>
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" role="button" data-toggle="dropdown">Users
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <input class="form-control" id="userFilter" type="text" placeholder="Filter...">
+            <li><a data-toggle="pill" href="#root">root</a></li>
+            <li><a data-toggle="pill" href="#daemon">daemon</a></li>
+            <li><a data-toggle="pill" href="#bin">bin</a></li>
+            <li><a data-toggle="pill" href="#sys">sys</a></li>
+            <li><a data-toggle="pill" href="#adm">adm</a></li>
+            <li><a data-toggle="pill" href="#uucp">uucp</a></li>
+        </ul>
+    </div>
+</div>
 
 {% endblock %}
