@@ -7,6 +7,20 @@
     border-top: 1px solid #e9e9e9;
 }
 
+.main-footer {
+    background-color: #ffffff !important;
+    margin-top: 6px;
+    border: #cdcdcd medium solid;
+    border-radius: 6px;
+}
+
+.main-header {
+    background-color: #ffffff !important;
+    margin-top: 6px;
+    border: #cdcdcd medium solid;
+    border-radius: 6px;
+}
+
 .sheets-footer {
     position: relative;
     bottom: 0;

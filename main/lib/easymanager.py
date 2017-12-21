@@ -1,4 +1,6 @@
 #!/usr/bin/python
+from __future__ import print_function
+
 """
 - Purpose:
 	Script that funtion as a cli menu for users to choose
@@ -25,6 +27,7 @@
 
 ### START OF MODULE IMPORTS ###
 import sys, getopt
+
 ### END OF MODULE IMPORTS
 
 ### START OF GLOBAL VARIABLES DECLARATION ###
@@ -51,19 +54,22 @@ def print_help():
     Parameters:
 
     """
-    print 'Usage: {} [-m module] [-i ansible_inventory] [--filters="filter1=value1[,value2];filter2=value1[,value2];..."] Target_hosts'.format(ARGS[0])
-    print 'Options:'
-    print '\t-m: module to manage. Default is lsusers.'
-    print '\t-i: ansible inventory file to be used. Default is /etc/ansible/hosts.'
-    print '\t-h: displays this help.'
-    print '\t--filters: A list of semi-colon separated "filter=value" filters. Valid filters per module are:'
-    print '\t\tlsusers:'
-    print '\t\t\tusers=user1[,user2,userN]. List only these users,'
-    print '\t\t\tfull=yes|no. default is "no" Whether yes or not to list ALL attributes from users. Caution! yes may result in long data.'
-    print
-    print 'Parameters:'
-    print '\tTarget_hosts: One Host, Group or Regex String that represents one or more valid Ansible Hosts.'
-    print ''
+    print('Usage: {} [-m module] [-i ansible_inventory] '
+          '[--filters="filter1=value1[,value2];filter2=value1[,value2];..."] Target_hosts'
+          .format(ARGS[0]))
+    print('Options:')
+    print('\t-m: module to manage. Default is lsusers.')
+    print('\t-i: ansible inventory file to be used. Default is /etc/ansible/hosts.')
+    print('\t-h: displays this help.')
+    print('\t--filters: A list of semi-colon separated "filter=value" filters. Valid filters per module are:')
+    print('\t\tlsusers:')
+    print('\t\t\tusers=user1[,user2,userN]. List only these users,')
+    print('\t\t\tfull=yes|no. default is "no" Whether yes or not to list ALL attributes from users. '
+          'Caution! yes may result in long data.')
+    print('')
+    print('Parameters:')
+    print('\tTarget_hosts: One Host, Group or Regex String that represents one or more valid Ansible Hosts.')
+    print('')
 # --------------------------------------------------------------- #
 
 # --------------------------------------------------------------- #
@@ -76,19 +82,18 @@ def parse_args():
         It doesn't try to validate if the provided hosts are valid or not.
 
     Parameters:
-
     """
     options = dict()
     try:
         optlist, args = getopt.getopt(ARGS[1:], 'm:i:h', ['filters='])  # getting the arguments except the script name
     except getopt.GetoptError as err:
         # print help information and exit:
-        print str(err)  # will print something like "option -a not recognized"
+        print(str(err))  # will print something like "option -a not recognized"
         print_help()
         sys.exit(1)
 
     if len(args) > 1:
-        print "Please inform only one set of hosts."
+        print("Please inform only one set of hosts.")
         print_help()
         sys.exit(1)
 
@@ -113,15 +118,15 @@ def parse_args():
     if options['filters'] is not False:
         for filter in options['filters'].split(';'):
             if filter.split('=')[0] != 'users' and filter.split('=')[0] != 'full':
-                print "Filter {} is not valid.".format(filter)
+                print("Filter {} is not valid.".format(filter))
                 print_help()
                 sys.exit(1)
 
             elif filter.split('=')[0] == 'full':
-               if filter.split('=')[1].lower() != 'yes' and filter.split('=')[1].lower() != 'no':
-                   print "Filter 'full' accepts only 'yes' or 'no'. "
-                   print_help()
-                   sys.exit(1)
+                if filter.split('=')[1].lower() != 'yes' and filter.split('=')[1].lower() != 'no':
+                    print("Filter 'full' accepts only 'yes' or 'no'. ")
+                    print_help()
+                    sys.exit(1)
 
     if len(args) > 0 and args[0] is not '':
         options['host_selection'] = False
@@ -176,44 +181,46 @@ def hosts_selection(inv_file):
 
     proceed = False
     while not proceed:
-        print 'No targets have been given. Displaying available choices based on Ansible\'s inventory file {}:'.format(inv_file)
-        print '--- Standalone hosts ---'
+        print('No targets have been given. '
+              'Displaying available choices based on Ansible\'s inventory file {}:'
+              .format(inv_file))
+        print('--- Standalone hosts ---')
         for host in standalone:
-            print '> {}'.format(host)
-        print ''
+            print('> {}'.format(host))
+        print('')
 
-        print '--- Groups ---'
-        for key, value in groups.iteritems():
-            print '> {} Members: {}'.format(key.ljust(24), ', '.join(value))
-        print ''
+        print('--- Groups ---')
+        for key, value in groups.items():
+            print('> {} Members: {}'.format(key.ljust(24), ', '.join(value)))
+        print('')
 
-        print '--- Group of Groups ---'
-        for key, value in groups_of_groups.iteritems():
-            print '> {} Members: {}'.format(key.ljust(24), ', '.join(value))
-        print ''
+        print('--- Group of Groups ---')
+        for key, value in groups_of_groups.items():
+            print('> {} Members: {}'.format(key.ljust(24), ', '.join(value)))
+        print('')
         selection = raw_input('Please inform host, group or group collection name.\n'
                               'You can use any combination and/or Regex that Ansible supports.\n-> ')
 
         confirmed = False
         while not confirmed:
-            print 'You selected: {}'.format(selection)
+            print('You selected: {}'.format(selection))
             answer = raw_input('Proceed? (y)es, (n)o, (a)bort\n-> ')
             if answer.lower() == 'yes' or answer.lower() == 'y':
                 confirmed = True
                 proceed = True
-                print ''
+                print('')
 
             elif answer.lower() == 'no' or answer.lower() == 'n':
                 confirmed = True
                 proceed = False
-                print ''
+                print('')
 
             elif answer.lower() == 'abort' or answer.lower() == 'a':
-                print 'Aborting the program ...'
+                print('Aborting the program ...')
                 sys.exit(1)
 
             else:
-                print 'Invalid choice.\n'
+                print('Invalid choice.\n')
                 proceed = False
 
         return selection
@@ -227,11 +234,11 @@ def mod_lsusers(options):
         options - (OrderedDict) A dictionaty contaning the options to run the module
     """
     from collections import OrderedDict
-    from libusers_ans import lsusers,mksheet,get_filename
+    from libusers_ans import lsusers,mksheet,FILENAME
     users_rawdata = OrderedDict()
 
-    print 'Retrieving User information from Ansible Hosts.'
-    print 'This may take a while, depending on how many hosts and users are involved ...'
+    print('Retrieving User information from Ansible Hosts.')
+    print('This may take a while, depending on how many hosts and users are involved ...')
     targ_hosts = options['targets']
     fulllist = False
     user_filter = "ALL"
@@ -248,16 +255,17 @@ def mod_lsusers(options):
     users_rawdata = lsusers(targ_hosts,fulllist,user_filter)
 
     if not users_rawdata:
-        print 'ERROR! It seems no Hosts could be reached or no user data could be retrieved.'
-        print 'Aborting ...\n'
+        print('ERROR! It seems no Hosts could be reached or no user data could be retrieved.')
+        print('Aborting ...\n')
         sys.exit(1)
     else:
         from os import path
-        print 'Done! information gathered. Creating the Sheet. It also may take a while...'
+        print('Done! information gathered. Creating the Sheet. It also may take a while...')
 
         # calling mksheet from  libusers_ans library
         mksheet(users_rawdata)
-        print 'Done! Sheet file saved as "{}". Have fun.'.format((path.dirname(path.realpath(__file__))) + '/' + get_filename())
+        print('Done! Sheet file saved as "{}". Have fun.'
+              .format((path.dirname(path.realpath(__file__))) + '/' + FILENAME))
 
 # --------------------------------------------------------------- #
 ### END OF FUNCTIONS DECLARATION ###
