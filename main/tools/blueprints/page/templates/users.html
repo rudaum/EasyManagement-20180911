@@ -3011,7 +3011,7 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-1"></div>
-                    <div class="col-lg-3 alert-danger text-left"><a data-toggle="pill" id="frango" href="#daemon">Potential conflict spotted: groups</a></div>
+                    <div class="col-lg-3 alert-danger text-left"><a data-toggle="pill" href="#daemon">Potential conflict spotted: groups</a></div>
                 </div>
                 <br>
                 <div class="row">
@@ -3286,8 +3286,12 @@
         });
     });
 
-  $("frango").click(function(){
-    document.getbyid('.dropdown-menu').selected = true;
-  });
+    $(document).ready(function(){
+        activaTab('aaa');
+    });
+
+    function activaTab(tab){
+        $('.nav-tabs a[href="#' + tab + '"]').tab('show');
+    };
 </script>
 {% endblock %}

@@ -18,8 +18,8 @@
 
 - TODO:
     - Retrieve and place somewhere the last login
-    - Update mkhtml() so it creates a Report Div
     - Implement a server (column) filter for the users
+    DONE - Update mkhtml() so it creates a Report Div
     DONE - lsusers not working properly when using 'user_filter'
 """
 ### START OF MODULE IMPORTS 
@@ -54,6 +54,7 @@ HEADER_BORDER = Border(left=Side(style='thin'),
 
 FILENAME = 'em_lsusers.xlsx'
 USERS_HTMLFILE = '../tools/blueprints/page/templates/users.html'
+HOME_HTMLFILE = '../tools/blueprints/page/templates/index.html'
 # --------------------------------------------------------------- #
 ### END OF GLOBAL VARIABLES DECLARATION
 
@@ -121,11 +122,11 @@ def update_report(wb, user, attr, attr_ref):
 # --------------------------------------------------------------- #
 def format_wb(wb):
     for sheet_index in range(1, len(wb.sheetnames)):
-        ws = wb.worksheets[sheet_index] #getting user's sheet
+        ws = wb.worksheets[sheet_index]  # getting user's sheet
         ws.column_dimensions['A'].width = 17
         spotted_rows = set()
         for row in range(1, ws.max_row + 1):
-            #ws_max_col = get_max_col(ws, row)
+            # ws_max_col = get_max_col(ws, row)
             for col in ws.iter_cols(min_row=row, max_row=row, min_col=1, max_col=ws.max_column):
                 for cell in col:
                     if cell.row is 1 or cell.column is 'A':
@@ -136,15 +137,15 @@ def format_wb(wb):
                             ws.column_dimensions[cell.column].width = 19
                     elif cell.row > 1 and cell.column is not 'A':
                         cell.fill = ATTR_FILL
-                        if cell.column is not 'B' :
+                        if cell.column is not 'B':
                             # Checking for possible conflicts:
                             if cell.value != ws['B' + str(cell.row)].value:
-                                spotted_rows.add(cell.row) # Adding possible conflict
+                                spotted_rows.add(cell.row)  # Adding possible conflict
 
         # Handling conflicts found
         for row in spotted_rows:
-            attr_ref = 'A'+str(row) #setting the attribute's name reference cell
-            update_report(wb, ws.title, ws[attr_ref].value, attr_ref) #Updating 'Report' sheet
+            attr_ref = 'A'+str(row)  # setting the attribute's name reference cell
+            update_report(wb, ws.title, ws[attr_ref].value, attr_ref)  # Updating 'Report' sheet
             for col in ws.iter_cols(min_row=row, max_row=row, min_col=1, max_col=ws.max_column):
                 for cell in col:
                     cell.fill = SPOT_FILL
@@ -261,21 +262,21 @@ class UserHtmlPage(object):
         self.html_code = []
 
     def tab(self,n):
-        '''
+        """
         To return a number of tabulations, given the parameter n
         :param n - tab multiplier. Use 0 to none
-        '''
+        """
         return ''.join(['    '] * n)
 
     def append_code(self, code):
-        '''
+        """
         Apends a HTML code and takes care of the Identention in the final code.
 
         :param code:
         :return:
-        '''
+        """
         code = code.lstrip()
-        if not code :
+        if not code:
             self.html_code.append(self.tab(self.l) + '<br>')
         elif code[:6] == '<input':
             self.html_code.append(self.tab(self.l) + code)
@@ -291,12 +292,12 @@ class UserHtmlPage(object):
             self.html_code.append(self.tab(self.l) + code)
 
     def mkReportDiv(self):
-        '''
+        """
         loops over the Users Dictionary and builds a HTML code, highlighting the
         Attributes that are not equal
 
         :return: code[]: a list foc HTML codes
-        '''
+        """
         htmlcode = []
         nincons = 0
 
@@ -306,15 +307,14 @@ class UserHtmlPage(object):
             inconsistences = u.getInconsistences()
             if u.getInconsistences():
 
-                #- Creating User's Row
+                # - Creating User's Row
                 htmlcode.append('<div class="row">')
-                htmlcode.append('<div class="col-lg-1 alert-info text-right">')
+                htmlcode.append('<div class="col-lg-1 alert-info text-left">')
                 htmlcode.append('<strong>{}</strong>'.format(user))
                 htmlcode.append('</div>')
                 htmlcode.append('</div>')
-                #- End of Table Header Code
 
-                #- Creating USer's inconsistences Row
+                # - Creating USer's inconsistences Row
                 for inconsistence in inconsistences:
                     nincons += 1
                     htmlcode.append('<div class="row">')
@@ -327,12 +327,12 @@ class UserHtmlPage(object):
 
                 htmlcode.append('')
 
-            #- Inserting the Number of Inconsistences Found
+        # - Inserting the Number of Inconsistences Found
         htmlcode.insert(0, '')
         htmlcode.insert(1,'<div class="row">')
         htmlcode.insert(2,'<div class="col-lg-1"></div>')
         htmlcode.insert(3,'<div class="col-lg-6 alert-warning text-left">'
-                        '<h4>   Number of Inconsistences Found: {}</h4></div>'.format(nincons))
+                        '<h4>Number of Inconsistences Found: {}</h4></div>'.format(nincons))
         htmlcode.insert(4,'</div>')
         htmlcode.insert(5, '')
         htmlcode.insert(6, '')
@@ -340,12 +340,12 @@ class UserHtmlPage(object):
         return htmlcode
 
     def BKPmkReportDiv(self):
-        '''
+        """
         loops over the Users Dictionary and builds a HTML code, highlighting the
         Attributes that are not equal
 
         :return: code[]: a list foc HTML codes
-        '''
+        """
         htmlcode = []
 
         for user in self.users.keys():
@@ -354,7 +354,7 @@ class UserHtmlPage(object):
             if u.getInconsistences():
                 htmlcode.append('<table class="table table-hover table-responsive">')
 
-                #- Creating the Report Table Header
+                # - Creating the Report Table Header
                 htmlcode.append('<thead>')
                 htmlcode.append('<tr>')
                 htmlcode.append('<th class="info">{}</th>'.format(user))  # Header's first column equal User
@@ -363,7 +363,7 @@ class UserHtmlPage(object):
                 htmlcode.append('</thead>')
                 #- End of Table Header Code
 
-                #- Creating inconsistences Table Body
+                # - Creating inconsistences Table Body
                 htmlcode.append('<tbody>')
                 for inconsistence in inconsistences:
                     htmlcode.append('<tr>')
@@ -377,7 +377,7 @@ class UserHtmlPage(object):
                 htmlcode.append('</tbody>')
                 # - End of Table Body Code
 
-                htmlcode.append('</table>') # closing the table
+                htmlcode.append('</table>')  # closing the table
                 htmlcode.append('')
         return htmlcode
 
@@ -386,7 +386,6 @@ class UserHtmlPage(object):
         self.l = 0
         self.html_code = []
         # Preparing the HTML Static content
-        html_file = open(USERS_HTMLFILE, 'w+')
         self.append_code("{% extends 'layouts/base.html' %}")
         self.append_code('{% block title %} Easy Manager - Users {% endblock %}')
         self.append_code(' ')
@@ -403,7 +402,7 @@ class UserHtmlPage(object):
         self.append_code('<a class="dropdown-toggle" data-toggle="dropdown" href="#">Users <b class="caret"></b></a>')
         self.append_code('<ul class="dropdown-menu">')
         self.append_code('<input class="form-control" id="userFilter" type="text" placeholder="Filter...">')
-        for user in self.users.keys(): # creating user's items
+        for user in self.users.keys():  # creating user's items
             self.append_code('<li><a data-toggle="pill" href="#{}">{}</a></li>'.format(user, user))
         self.append_code('</ul>')
         self.append_code('</li>')
@@ -428,7 +427,7 @@ class UserHtmlPage(object):
             self.append_code(linecode)
         self.append_code('</div>')
 
-        self.append_code('</div>') # closing <div> 'tab-content'
+        self.append_code('</div>')  # closing <div> 'tab-content'
         self.append_code('</div>')  # closing <div> 'container'
 
         # Adding the JS script to handle user's filter
@@ -445,7 +444,7 @@ class UserHtmlPage(object):
         self.append_code("{% endblock %}")
         ### END OF THE HTML CODE ###
 
-        #-- Creating the HTML File --#
+        # -- Creating the HTML File -- #
         htmlfile = open(USERS_HTMLFILE, 'w+')
         for linecode in self.html_code:
             htmlfile.write(linecode + '\n')
@@ -454,7 +453,7 @@ class UserHtmlPage(object):
 
 # --------------------------------------------------------------- #
 class User(object):
-    '''
+    """
     Represents the servers User and its attributes.
     Has many methods to create the HTML code and one to return the
     code as one String
@@ -464,7 +463,7 @@ class User(object):
         userdict{} = The original OrderedDict generated by Ansible.
         attributes[]: A Dictionary containing the user attributes.
         servers[]: A list containing the servers the user is present
-    '''
+    """
 
     def __init__(self, userdict):
         self.userdict = userdict
@@ -484,13 +483,13 @@ class User(object):
                 self.attributes = list(OrderedDict.fromkeys(self.attributes))
 
     def isAttrEqual(self,attr):
-        '''
+        """
         Checks if the user's attribute's value is the same among all servers
         Return True if it is, False if don't
 
         :param attr: The User's attribute to be checked
         :return: Boolean.
-        '''
+        """
         attrvalues = []
         for srv in self.servers:
             if attr in self.userdict[srv].keys():
@@ -509,12 +508,12 @@ class User(object):
         return inconsistences
 
     def mkUserHtmlTable(self):
-        '''
+        """
         Builds a HTML Table Code based upon the userdict.
         Returns a list containing one code line per list element.
 
         :return: A List htmlcode[]
-        '''
+        """
         htmlcode = []
         htmlcode.append('<table class="table table-hover table-responsive table-bordered">')
         # - Table Header code
@@ -538,7 +537,7 @@ class User(object):
             else:
                 htmlcode.append('<tr class="danger">')
 
-                # Inserting the Attribute Names a Header
+            # Inserting the Attribute Names a Header
             htmlcode.append('<th>{}</th>'.format(attr))
 
             for srv in self.servers:  # Inserting the Attributes and values
@@ -550,7 +549,7 @@ class User(object):
 
             htmlcode.append('</tr>') # Closing attr's row
 
-        #htmlcode.extend(code) # Extending with the new body code.
+        # htmlcode.extend(code) # Extending with the new body code.
         htmlcode.append('</tbody>')
         # - End of Table Body Code
         htmlcode.append('</table>')
