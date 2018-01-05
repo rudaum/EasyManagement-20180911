@@ -2,178 +2,25 @@
 {% block title %} Easy	Manager - Home	{% endblock %}
 
 {% block body %}
-
-<ul class="nav nav-tabs" role="tablist">
-    <li><a class="active" data-toggle="pill" href="#report">Report</a></li>
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Users <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-            <input class="form-control" id="userFilter" type="text" placeholder="Filter...">
-            <li><a data-toggle="pill" href="#root">root</a></li>
-            <li><a data-toggle="pill" href="#daemon">daemon</a></li>
-            <li><a data-toggle="pill" href="#bin">bin</a></li>
-        </ul>
-    </li>
-</ul>
-
-<div class="tab-content">
-    <div id="report" role="tabpanel" class="tab-pane active" >
-        <a>Hello</a>
-    </div>
-    <div id="root" role="tabpanel" class="tab-pane">
-        <div class="text-center"><h4>User: root</h4></div>
-        <table class="table table-hover table-responsive table-bordered">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>dehamsp40</th>
-                    <th>dehamsp20</th>
-                    <th>dehamsp36</th>
-                    <th>denotsp36</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th>id</th>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                </tr>
-                <tr>
-                    <th>pgrp</th>
-                    <td>system</td>
-                    <td>system</td>
-                    <td>system</td>
-                    <td>system</td>
-                </tr>
-                <tr>
-                    <th>groups</th>
-                    <td>system,bin,sys,security,cron,audit,lp</td>
-                    <td>system,bin,sys,security,cron,audit,lp</td>
-                    <td>system,bin,sys,security,cron,audit,lp</td>
-                    <td>system,bin,sys,security,cron,audit,lp</td>
-                </tr>
-                <tr>
-                    <th>home</th>
-                    <td>/</td>
-                    <td>/</td>
-                    <td>/</td>
-                    <td>/</td>
-                </tr>
-                <tr>
-                    <th>shell</th>
-                    <td>/usr/bin/ksh</td>
-                    <td>/usr/bin/ksh</td>
-                    <td>/usr/bin/ksh</td>
-                    <td>/usr/bin/ksh</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div id="daemon" class="tab-pane">
-        <div class="text-center"><h4>User: daemon</h4></div>
-        <table class="table table-hover table-responsive table-bordered">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>dehamsp40</th>
-                    <th>dehamsp20</th>
-                    <th>dehamsp36</th>
-                    <th>denotsp36</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th>id</th>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                </tr>
-                <tr>
-                    <th>pgrp</th>
-                    <td>staff</td>
-                    <td>staff</td>
-                    <td>staff</td>
-                    <td>staff</td>
-                </tr>
-                <tr class="danger">
-                    <th>groups</th>
-                    <td>staff</td>
-                    <td>staff,daemon</td>
-                    <td>staff</td>
-                    <td>staff</td>
-                </tr>
-                <tr>
-                    <th>home</th>
-                    <td>/etc</td>
-                    <td>/etc</td>
-                    <td>/etc</td>
-                    <td>/etc</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div id="bin" class="tab-pane">
-        <div class="text-center"><h4>User: bin</h4></div>
-        <table class="table table-hover table-responsive table-bordered">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>dehamsp40</th>
-                    <th>dehamsp20</th>
-                    <th>dehamsp36</th>
-                    <th>denotsp36</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th>id</th>
-                    <td>2</td>
-                    <td>2</td>
-                    <td>2</td>
-                    <td>2</td>
-                </tr>
-                <tr>
-                    <th>pgrp</th>
-                    <td>bin</td>
-                    <td>bin</td>
-                    <td>bin</td>
-                    <td>bin</td>
-                </tr>
-                <tr>
-                    <th>groups</th>
-                    <td>bin,sys,adm</td>
-                    <td>bin,sys,adm</td>
-                    <td>bin,sys,adm</td>
-                    <td>bin,sys,adm</td>
-                </tr>
-                <tr>
-                    <th>home</th>
-                    <td>/bin</td>
-                    <td>/bin</td>
-                    <td>/bin</td>
-                    <td>/bin</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-    $(document).ready(function(){
-      $("#userFilter").on("keyup", function() {
-          var value = $(this).val().toLowerCase();
-          $(".dropdown-menu li").filter(function() {
-              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-              });
-          });
-    });
-
-
-</script>
-
-
-
+            <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+            <div class="well">
+                <ul class="nav nav-list">
+                    <li><label class="tree-toggler nav-header">+ Menu</label>
+                        <ul class="nav nav-list tree">
+                            <li><label class="tree-toggler nav-header">+ Users</label>
+                                <ul class="nav nav-list tree">
+                                    <li><label class="tree-toggler nav-header">+ Report</label>
+                                        <ul class="nav nav-list tree">
+                                            <li><a href="/users">Alfredo</a></li>
+                                            <li><a href="#">Geremias</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="divider"></li>
+                </ul>
+            </div>
+            <script src="/static/js/index.js"></script>
 {% endblock %}
