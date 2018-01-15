@@ -16,18 +16,23 @@
 
 - TODO:
     - Implement a server (column) filter for the users
+    - Retrieve Ansible Inventory and build a filter on it.
+    - Generate a 'FIX' button. to popup a wizard that fixes the issue via Ansible
 """
 ### START OF MODULE IMPORTS
 # --------------------------------------------------------------- #
 from libusers_ans import mkuserdict, User
+
 # --------------------------------------------------------------- #
 ### END OF MODULE IMPORTS
 
 ### START OF GLOBAL VARIABLES DECLARATION
 # --------------------------------------------------------------- #
-BASE_HTMLFILE = '../templates/layouts/base-test.html'
+BASE_HTMLFILE = '../templates/layouts/base.html'
 HOME_HTMLFILE = '../tools/blueprints/page/templates/index.html'
-USERS_HTMLFILE = '../tools/blueprints/page/templates/users-test.html'
+USERS_HTMLFILE = '../tools/blueprints/page/templates/users.html'
+
+
 # ANS_USERS = mkuserdict()
 # --------------------------------------------------------------- #
 ### END OF GLOBAL VARIABLES DECLARATION
@@ -59,10 +64,7 @@ class HtmlPage(object):
         if not code:
             self.html_code.append(self.tabber(self.tab) + '<br>')
         # if it is input, link or comentary, don't increase tab
-        elif code[:7] == '<input ' or \
-             code[:6] == '<link ' or \
-             code[:2] == '<!' or \
-             '{% extends ' in code:
+        elif code[:7] == '<input ' or code[:6] == '<link ' or code[:2] == '<!' or '{% extends ' in code:
             self.html_code.append(self.tabber(self.tab) + code)
         else:
             openers = 0
@@ -106,27 +108,28 @@ class HtmlPage(object):
         # -- Creating Tree Browser-- #
         # Creating the Tree ...
         htmlcode.append('<ul class="nav nav-list">')  # Opening ul
-        htmlcode.append('<li><label class="tree-toggler">+ Users </label> <a class="small" href="/users">(See All)</a>')  # Opening ul.li
-        htmlcode.append('<ul class="nav nav-list tree">')  # Opening ul.li.ul
+        htmlcode.append('<li>')  # Opening ul.li
+        htmlcode.append('<label class="tree-toggler">+ Users </label>')
+        htmlcode.append('<ul class="nav nav-list tree">')
 
         # Generating Users Report
         htmlcode.append('<li><label class="tree-toggler nav-header">+ Report '
                         '</label><span class="badge">0</span>')  # Opening ul.li.ul.li Users -> Report
-        reportidx = len(htmlcode) - 1  # Used to insert an updated line of code with the total inconsistencies of all users
+        reportidx = len(
+            htmlcode) - 1  # Used to insert an updated line of code with the total inconsistencies of all users
 
         # looping over users
         for user in self.users.keys():
-            inconsistences = User(self.users[user]).getInconsistences()
+            inconsistences = User(user,self.users[user]).getInconsistences()
             if inconsistences:
                 htmlcode.append('<ul class="nav nav-list tree">')  # Opening ul.li.ul.li.ul
                 usertotal = len(inconsistences)
                 reporttotal += usertotal
 
                 # Creating User's inconsistences item
-                htmlcode.append('<li><label class="tree-toggler nav-header small">+ {}</label>'
-                                .format(user))  # Opening ul.li.ul.li.ul.li UserBadge
-                htmlcode.append('<span class="label label-warning">{}</span>'
-                                .format(usertotal))
+                htmlcode.append('<li><label class="tree-toggler nav-header small">+ {}</label>'.format(
+                    user))  # Opening ul.li.ul.li.ul.li UserBadge
+                htmlcode.append('<span class="label label-default">{}</span>'.format(usertotal))
 
                 # Generating Link Inconsistence Items ...
                 htmlcode.append('<ul class="nav nav-list tree">')  # Opening ul.li.ul.li.ul.li.ul
@@ -157,6 +160,7 @@ class HtmlPage(object):
 
         return htmlcode
 
+
 class BasePage(HtmlPage):
     def __init__(self):
         HtmlPage.__init__(self)
@@ -175,16 +179,25 @@ class BasePage(HtmlPage):
         self.append_code('<link rel="stylesheet" type="text/css" '
                          'href="{{ url_for(\'static\', filename=\'css/base.css\') }}">')
         self.append_code('<link rel="stylesheet" type="text/css" '
-                         'href="{{ url_for(\'static\', filename=\'css/font-awesome.min.css\') }}">')
+                         'href="{{ url_for(\'static\', filename=\'css/fontawesome-all.css\') }}">')
         self.append_code('<title> {% block title %} {% endblock %} </title>')
         self.append_code('</head>')
         self.append_code('<body>')
         self.append_code('<div class="main-header text-center">')
         self.append_code('<h2><a href="/">Easy Management</a></h2>')
         self.append_code('</div>')
+        self.append_code('<nav class="navbar navbar-default">')
+        self.append_code('<div class="container-fluid">')
+        self.append_code('<ul class="nav navbar-nav">')
+        self.append_code('<li id="tab-home"><a href="/"><b><i class="fa fa-home"></i> Home</b></a></li>')
+        self.append_code('<li id="tab-users"><a href="/users"><b><i class="fa fa-users"></i> Users</b></a></li>')
+        self.append_code('</ul>')
+        self.append_code('</div>')
+        self.append_code('</nav>')
+
         self.append_code('<div class="panel-base">')
         self.append_code('<div class="col-lg-2 panel-tree">')
-        self.append_code('<h4> Browser<button class="btn btn-link btn-sm" id="tree-toggler"><b>(+)</b></button></h4>')
+        self.append_code('<h4> Browser <span><button class="btn btn-link btn-sm" id="tree-toggler"><sup><b>(expand all)</b></sup></button></span></h4>')
 
         # Generating the Browser Tree Menu
         for line in self.mktreemenu():
@@ -211,13 +224,14 @@ class BasePage(HtmlPage):
             htmlfile.write(linecode + '\n')
         htmlfile.close()
 
+
 class IndexPage(HtmlPage):
     def __init__(self):
         HtmlPage.__init__(self)
         self.pagename = 'Home'
         self.buildhtml(self.pagename)
 
-    def buildhtml(self,pagename):
+    def buildhtml(self, pagename):
         # Preparing the HTML Static content
         self.append_code("{% extends 'layouts/base.html' %}")
         self.append_code('{% block title %} Easy Manager - ' + pagename + '{% endblock %}')
@@ -246,7 +260,7 @@ class UserPage(HtmlPage):
         htmlcode.append('<tr>')
         htmlcode.append('<th></th>')  # Header's first column has to be empty
         for srv in user.servers:  # Inserting the Server names as Table Header
-            htmlcode.append('<th>{}</th>'.format(srv))
+            htmlcode.append('<th id="#{}-{}">{}</th>'.format(user.username,srv, srv))
         htmlcode.append('</tr>')
         htmlcode.append('</thead>')
         # - End of Table Header Code
@@ -262,12 +276,11 @@ class UserPage(HtmlPage):
                 htmlcode.append('<tr class="danger">')
 
             # Inserting the Attribute Names a Header
-            htmlcode.append('<th>{}</th>'.format(attr))
+            htmlcode.append('<th>{} <span>- ME ATUALIZE - </span></th>'.format(attr))
 
             for srv in user.servers:  # Inserting the Attributes and values
                 if attr in user.userdict[srv].keys():
-                    htmlcode.append('<td>{}</td>'
-                                    .format(user.userdict[srv][attr].encode('utf-8')))
+                    htmlcode.append('<td>{}</td>'.format(user.userdict[srv][attr].encode('utf-8')))
                 else:
                     htmlcode.append('<td></td>')
 
@@ -279,7 +292,7 @@ class UserPage(HtmlPage):
         htmlcode.append('</table>')
         return htmlcode
 
-    def buildhtml(self,pagename):
+    def buildhtml(self, pagename):
         # Preparing the HTML Static content
         self.append_code("{% extends 'layouts/base.html' %}")
         self.append_code('{% block title %}Easy Manager - ' + pagename + '{% endblock %}')
@@ -293,7 +306,7 @@ class UserPage(HtmlPage):
         self.append_code('<li class="dropdown">')
         self.append_code('<a class="dropdown-toggle" data-toggle="dropdown" href="#">Users <b class="caret"></b></a>')
         self.append_code('<ul class="dropdown-menu">')
-        self.append_code('<input class="form-control" id="userFilter" type="text" placeholder="Filter...">')
+        self.append_code('<input class="form-control" id="userFilter" type="text" placeholder="Search user ...">')
         for user in self.users.keys():  # creating user's items
             self.append_code('<li><a data-toggle="pill" href="#{}">{}</a></li>'.format(user, user))
         self.append_code('</ul>')
@@ -308,7 +321,7 @@ class UserPage(HtmlPage):
             self.append_code('<div id="{}" class="tab-pane">'.format(user))
             self.append_code('<div class="text-center"><h4>User: {}</h4></div>'.format(user))
             # Parsing the Userdict and retrieving its table's HTML code.
-            for linecode in self.mkusertable(User(self.users[user])):
+            for linecode in self.mkusertable(User(user, self.users[user])):
                 self.append_code(linecode)
             self.append_code('</div>')
 

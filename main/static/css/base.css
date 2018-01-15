@@ -1,21 +1,12 @@
-/*body {
-    padding-left: 2%;
-    padding-right: 2%;
-}*/
-
 .main-header {
     width: 100%;
     background-color: #ffffff solid;
     margin-top: 6px;
     border: #cdcdcd medium solid;
     border-radius: 6px;
+    margin-bottom: 1.5%;
 }
 
-.panel-base {
-    position: relative;
-    top: 40px;
-    background-color: #ffffff;
-}
 
 .tree-l1 {
     margin-left:0px;
@@ -23,6 +14,24 @@
 
 ul{
   margin-left:10px;
+}
+
+.panel-base {
+    position: relative;
+    top: 40px;
+}
+
+.content-main {
+    width: 84% !important;
+    overflow: scroll;
+    height: 75vh;
+}
+
+.panel-tree {
+    width: 16%;
+    background-color: #f0fefa;
+    overflow: scroll;
+    height: 75vh;
 }
 
 .panel-tree span {
@@ -34,18 +43,8 @@ ul{
     font-size: 115%
 }
 
-
-.content-main {
-    height: 800px;
-    width: 80% !important;
-    overflow: scroll;
-}
-
-.panel-tree {
-    height: 800px;
-    width: 15% !important;
-    background-color: #f0fefa;
-    overflow: scroll;
+.navbar {
+    padding-left: 14%;
 }
 
 .alignleft {
