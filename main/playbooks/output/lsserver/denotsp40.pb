@@ -1,0 +1,1 @@
+["Node Name:denotsp40", "Partition Number:6", "Type:Shared-SMT-4", "Mode:Uncapped", "Entitled Capacity:2.00", "Online Virtual CPUs:4", "Maximum Virtual CPUs:8", "Minimum Virtual CPUs:1", "Online Memory:16384 MB", "Desired Virtual CPUs:4", "Oslevel:7100-05-02-1810", "Is Cluster:\"ftpext-test\" (dehamsp40 denotsp40)", "IP Address:10.61.42.130"]

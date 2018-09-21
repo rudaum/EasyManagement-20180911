@@ -1,0 +1,24 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+     - name: Transferring the lsuser temp script
+       copy: src=support_scripts/lsuser.sh dest=/tmp/lsuser.sh mode=0755
+
+     - name: Executing the lsuser script
+       command: sh /tmp/lsuser.sh
+       register: output
+       become: yes
+       become_method: sudo
+
+     - name: Cleaning the temp Script
+       file:
+         state: absent
+         path: "/tmp/lsuser.sh"
+
+     - name: Output Attributes
+       # local_action: copy content="{{ output }}" dest=/tmp/"{{ inventory_hostname }}"
+       local_action: copy content={{ output.stdout_lines }} dest=/data/ansible/EasyManagement/main/playbooks/output/lsuser/{{ inventory_hostname }}.pb
+       with_items:
+       - output
+       # debug: var=output.stdout_lines

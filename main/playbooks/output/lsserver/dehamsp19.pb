@@ -1,0 +1,1 @@
+["Node Name:dehamsp19", "Partition Number:11", "Type:Shared-SMT", "Mode:Uncapped", "Entitled Capacity:4.00", "Online Virtual CPUs:5", "Maximum Virtual CPUs:8", "Minimum Virtual CPUs:1", "Online Memory:65536 MB", "Desired Virtual CPUs:5", "Oslevel:7100-05-02-1810", "Is Cluster:\"parisade\" (dehamsp19 denotsp19)", "IP Address:10.61.44.153"]

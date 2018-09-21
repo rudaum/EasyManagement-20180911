@@ -1,0 +1,1 @@
+["Node Name:vios-h1", "Partition Number:1", "Type:Shared-SMT-4", "Mode:Uncapped", "Entitled Capacity:1.00", "Online Virtual CPUs:4", "Maximum Virtual CPUs:8", "Minimum Virtual CPUs:1", "Online Memory:4096 MB", "Desired Virtual CPUs:4", "Oslevel:6100-09-09-1717", "Is Cluster:Not Clustered", "IP Address:10.61.44.31"]

@@ -1,0 +1,23 @@
+---
+- hosts: all
+  gather_facts: no
+  
+  tasks:
+     - name: Transfer the temp script
+       copy: src=support_scripts/lsserver.sh dest=/tmp/lsserver.sh mode=0777
+
+     - name: Execute the script
+       command: sh /tmp/lsserver.sh
+       register: output
+
+     - name: Clean the temp Script
+       file:
+         state: absent
+         path: "/tmp/lsserver.sh"
+
+     - name: Output Attributes
+       # local_action: copy content="{{ output }}" dest=/tmp/"{{ inventory_hostname }}"
+       local_action: copy content={{ output.stdout_lines }} dest=/data/ansible/EasyManagement/main/playbooks/output/lsserver/{{ inventory_hostname }}.pb
+       with_items:
+       - output
+       # debug: var=output.stdout_lines

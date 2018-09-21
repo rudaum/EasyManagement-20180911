@@ -1,0 +1,1 @@
+["Node Name:alibaba", "Partition Number:13", "Type:Shared-SMT", "Mode:Uncapped", "Entitled Capacity:1.00", "Online Virtual CPUs:2", "Maximum Virtual CPUs:4", "Minimum Virtual CPUs:1", "Online Memory:16384 MB", "Desired Virtual CPUs:2", "Oslevel:7100-05-02-1810", "Is Cluster:Not Clustered", "IP Address:10.61.44.145"]

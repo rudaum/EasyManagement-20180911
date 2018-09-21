@@ -1,0 +1,1 @@
+["Node Name:dehamsp27", "Partition Number:9", "Type:Shared-SMT", "Mode:Uncapped", "Entitled Capacity:5.00", "Online Virtual CPUs:6", "Maximum Virtual CPUs:8", "Minimum Virtual CPUs:1", "Online Memory:102400 MB", "Desired Virtual CPUs:6", "Oslevel:7100-05-02-1810", "Is Cluster:\"ibedi4\" (dehamsp27 denotsp27)", "IP Address:10.61.221.30"]

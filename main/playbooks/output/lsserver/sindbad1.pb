@@ -1,0 +1,1 @@
+["Node Name:sindbad1", "Partition Number:6", "Type:Dedicated-SMT", "Mode:Capped", "Entitled Capacity:42.00", "Online Virtual CPUs:42", "Maximum Virtual CPUs:46", "Minimum Virtual CPUs:20", "Online Memory:112640 MB", "Desired Virtual CPUs:42", "Oslevel:7100-05-02-1810", "Is Cluster:\"sindbad\" (sindbad1 sindbad2)", "IP Address:10.61.44.252"]

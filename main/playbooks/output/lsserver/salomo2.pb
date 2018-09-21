@@ -1,0 +1,1 @@
+["Node Name:salomo2", "Partition Number:14", "Type:Shared-SMT-4", "Mode:Uncapped", "Entitled Capacity:2.00", "Online Virtual CPUs:3", "Maximum Virtual CPUs:4", "Minimum Virtual CPUs:1", "Online Memory:6144 MB", "Desired Virtual CPUs:3", "Oslevel:7100-05-02-1810", "Is Cluster:\"salomo\" (salomo1 salomo2)", "IP Address:10.61.44.24"]

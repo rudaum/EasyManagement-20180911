@@ -1,0 +1,1 @@
+["Node Name:dehamsp29", "Partition Number:7", "Type:Shared-SMT-4", "Mode:Uncapped", "Entitled Capacity:0.40", "Online Virtual CPUs:1", "Maximum Virtual CPUs:4", "Minimum Virtual CPUs:1", "Online Memory:16384 MB", "Desired Virtual CPUs:1", "Oslevel:7100-04-03-1642", "Is Cluster:\"kn-workplace-db\" (dehamsp29 denotsp29)", "IP Address:10.61.42.103"]

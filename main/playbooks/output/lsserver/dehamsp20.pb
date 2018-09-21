@@ -1,0 +1,1 @@
+["Node Name:dehamsp20", "Partition Number:12", "Type:Shared-SMT", "Mode:Uncapped", "Entitled Capacity:1.00", "Online Virtual CPUs:2", "Maximum Virtual CPUs:3", "Minimum Virtual CPUs:1", "Online Memory:20480 MB", "Desired Virtual CPUs:2", "Oslevel:7100-05-02-1810", "Is Cluster:Not Clustered", "IP Address:10.61.44.158"]

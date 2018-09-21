@@ -1,0 +1,1 @@
+["Node Name:dehamsp31", "Partition Number:5", "Type:Shared-SMT-4", "Mode:Uncapped", "Entitled Capacity:0.60", "Online Virtual CPUs:3", "Maximum Virtual CPUs:3", "Minimum Virtual CPUs:1", "Online Memory:8192 MB", "Desired Virtual CPUs:3", "Oslevel:7100-05-02-1810", "Is Cluster:\"ftpint\" (dehamsp31 denotsp31)", "IP Address:10.61.42.105"]

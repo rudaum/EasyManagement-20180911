@@ -1,0 +1,1 @@
+["Node Name:denotsp26", "Partition Number:8", "Type:Shared-SMT", "Mode:Uncapped", "Entitled Capacity:2.00", "Online Virtual CPUs:3", "Maximum Virtual CPUs:5", "Minimum Virtual CPUs:1", "Online Memory:61440 MB", "Desired Virtual CPUs:3", "Oslevel:7100-05-02-1810", "Is Cluster:\"ibcom3\" (dehamsp26 denotsp26)", "IP Address:10.61.221.36"]

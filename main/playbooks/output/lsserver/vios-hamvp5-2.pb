@@ -1,0 +1,1 @@
+["Node Name:vios-hamvp5-2", "Partition Number:2", "Type:Shared-SMT-4", "Mode:Uncapped", "Entitled Capacity:1.00", "Online Virtual CPUs:2", "Maximum Virtual CPUs:4", "Minimum Virtual CPUs:1", "Online Memory:6144 MB", "Desired Virtual CPUs:2", "Oslevel:6100-09-09-1717", "Is Cluster:Not Clustered", "IP Address:10.61.42.32"]

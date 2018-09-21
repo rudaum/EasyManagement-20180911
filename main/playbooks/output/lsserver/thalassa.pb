@@ -1,0 +1,1 @@
+["Node Name:thalassa", "Partition Number:3", "Type:Shared-SMT", "Mode:Uncapped", "Entitled Capacity:4.00", "Online Virtual CPUs:5", "Maximum Virtual CPUs:8", "Minimum Virtual CPUs:1", "Online Memory:102400 MB", "Desired Virtual CPUs:5", "Oslevel:7100-05-02-1810", "Is Cluster:\"ibaz\" (nereid thalassa)", "IP Address:10.61.44.23"]

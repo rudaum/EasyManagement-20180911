@@ -1,0 +1,1 @@
+lsuser -f ALL
